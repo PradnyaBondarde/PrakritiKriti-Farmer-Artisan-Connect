@@ -1,0 +1,1186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PrakritiKriti - Artisan Profile</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <style>
+        :root {
+            --primary-color: #4caf50;
+            --primary-light: #80e27e;
+            --primary-dark: #087f23;
+            --white: #ffffff;
+            --error: #ff3333;
+            --text-color: #333333;
+            --text-dark: #222222;
+            --gray-100: #f8f9fa;
+            --gray-200: #e9ecef;
+            --gray-300: #dee2e6;
+            --gray-400: #ced4da;
+            --gray-500: #adb5bd;
+            --gray-600: #6c757d;
+            --gray-700: #495057;
+            --gray-800: #343a40;
+            --success: #28a745;
+            --warning: #ffc107;
+            --info: #17a2b8;
+            --body-bg: #f9fbf7;
+            --card-bg: #ffffff;
+            --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --border-radius: 8px;
+            --transition: all 0.3s ease;
+        }
+
+        [data-theme="dark"] {
+            --primary-color: #4caf50;
+            --primary-light: #087f23;
+            --primary-dark: #80e27e;
+            --white: #1e1e1e;
+            --text-color: #e0e0e0;
+            --text-dark: #ffffff;
+            --body-bg: #121212;
+            --card-bg: #1e1e1e;
+            --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            --gray-100: #2d2d2d;
+            --gray-200: #333333;
+            --gray-300: #444444;
+            --gray-400: #555555;
+            --gray-500: #777777;
+            --gray-600: #999999;
+            --gray-700: #bbbbbb;
+            --gray-800: #dddddd;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+      
+        body {
+            display: flex;
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+
+        .sidebar {
+            width: 250px;
+            height: 100vh;
+            position: fixed;
+            background: var(--white);
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            z-index: 1000;
+        }
+
+        .main-container {
+            flex: 1;
+            margin-left: 250px;
+            min-height: 100vh;
+            padding: 20px;
+            background: var(--body-bg);
+        }
+
+
+        .logo {
+            display: flex;
+            align-items: center;
+            padding: 10px 0 20px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .sidebar nav {
+            flex: 1;
+        }
+
+        .sidebar ul {
+            list-style-type: none;
+        }
+
+        .sidebar li {
+            padding: 12px 15px;
+            margin-bottom: 8px;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+        }
+
+        .sidebar li:hover {
+            background-color: var(--primary-light);
+            color: var(--text-dark);
+        }
+
+        .sidebar li.active {
+            background-color: var(--primary-color);
+            color: var(--white);
+        }
+        .sidebar {
+            width: 250px;
+            height: 100vh;
+            position: fixed;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .sidebar-footer {
+            padding: 15px;
+            text-align: center;
+            border-top: 1px solid var(--gray-200);
+            margin-top: auto;
+        }
+
+        /* Updated Waste Types Dropdown */
+        .other-waste-container {
+            margin-top: 10px;
+            display: none;
+        }
+
+        .other-waste-container.show {
+            display: block;
+        }
+
+        /* Validation Styles */
+        .validation-error {
+            border-color: var(--error) !important;
+            box-shadow: 0 0 0 2px rgba(255, 51, 51, 0.2);
+        }
+        /* .main-container {
+    flex: 1;
+    margin-left: 250px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+} */
+
+.content-wrapper {
+    flex: 1;
+    padding: 30px;
+    max-width: 100%;
+}
+
+/* Update header styles */
+header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 30px;
+            background: var(--card-bg);
+            box-shadow: var(--card-shadow);
+            margin-bottom: 30px;
+            border-radius: var(--border-radius);
+        }
+
+        header h1 {
+            font-size: 1.8rem;
+            color: var(--primary-dark);
+            margin: 0;
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+.profile-form {
+            max-width: 100%;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        @media (max-width: 768px) {
+            body {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                position: relative;
+                width: 100%;
+                height: auto;
+            }
+
+            .main-container {
+                margin-left: 0;
+                padding: 15px;
+            }
+
+            .form-row {
+                flex-direction: column;
+            }
+
+            .address-grid {
+                grid-template-columns: 1fr;
+            }
+
+            /* .toast {
+                bottom: 10px;
+                width: 95%;
+            } */
+        }
+
+.form-row,
+.address-grid,
+.multi-select,
+.price-input {
+    width: 100%;
+}
+
+.form-group {
+    flex: 1;
+    min-width: 0; /* Prevent overflow */
+}
+        /* Rest of form elements styles remain same... */
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .section-header i {
+            font-size: 1.5rem;
+            color: var(--primary-color);
+            margin-right: 10px;
+        }
+
+        .section-header h2 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .form-row {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 20px;
+    width: 100%;
+}
+
+.form-group {
+    flex: 1;
+    min-width: 0; /* Prevent overflow */
+}
+
+.address-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    width: 100%;
+}
+
+
+        .form-row .form-group {
+            flex: 1;
+            margin-bottom: 0;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text-dark);
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid var(--gray-300);
+            border-radius: var(--border-radius);
+            background-color: var(--gray-100);
+            color: var(--text-color);
+            font-family: inherit;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+        }
+
+        .verified-input {
+            position: relative;
+        }
+
+        .verified-badge {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: var(--success);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .verified-badge i {
+            margin-right: 4px;
+        }
+
+        
+        /* Price Input */
+        .price-input {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+}
+
+/* Make dropdowns full width */
+.multi-select {
+    width: 100%;
+}
+
+        .price-input input {
+            flex: 1;
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+
+        .price-input select {
+            width: 120px;
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+            border-left: none;
+        }
+
+        /* Multi-select */
+        .multi-select {
+            border: 1px solid var(--gray-300);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            background-color: var(--gray-100);
+        }
+
+        .selected-tags {
+            display: flex;
+            flex-wrap: wrap;
+            padding: 5px;
+            gap: 5px;
+            min-height: 42px;
+        }
+
+        .tag {
+            background-color: var(--primary-light);
+            color: var(--text-dark);
+            border-radius: 16px;
+            padding: 4px 10px;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .tag i {
+            margin-left: 5px;
+            cursor: pointer;
+        }
+
+        .dropdown {
+            position: relative;
+        }
+
+        .dropdown input {
+            border: none;
+            border-top: 1px solid var(--gray-300);
+            border-radius: 0;
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background-color: var(--white);
+            border: 1px solid var(--gray-300);
+            border-top: none;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 10;
+            display: none;
+        }
+
+        .dropdown-menu.show {
+            display: block;
+        }
+
+        .dropdown-menu label {
+            display: block;
+            padding: 8px 15px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .dropdown-menu label:hover {
+            background-color: var(--gray-200);
+        }
+
+        /* Month grid */
+        .month-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 10px;
+        }
+
+        .month {
+            display: flex;
+            align-items: center;
+            padding: 8px;
+            background-color: var(--gray-200);
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .month input {
+            width: auto;
+            margin-right: 5px;
+        }
+
+        .month:hover {
+            background-color: var(--primary-light);
+        }
+
+        .month input:checked+.month {
+            background-color: var(--primary-color);
+            color: var(--white);
+        }
+
+        /* Checkbox group */
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .checkbox {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .checkbox input {
+            width: auto;
+            margin-right: 5px;
+        }
+
+        /* File upload */
+        .upload-area {
+            border: 2px dashed var(--primary-color);
+            border-radius: var(--border-radius);
+            padding: 30px;
+            text-align: center;
+            background-color: rgba(76, 175, 80, 0.05);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .upload-area:hover {
+            background-color: rgba(76, 175, 80, 0.1);
+        }
+
+        .upload-area i {
+            font-size: 2rem;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .upload-area span {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .file-types {
+            font-size: 0.85rem;
+            color: var(--gray-600);
+        }
+
+        .upload-preview {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px;
+            border: 1px solid var(--gray-300);
+            border-radius: var(--border-radius);
+            margin-top: 10px;
+        }
+
+        .preview-file {
+            display: flex;
+            align-items: center;
+        }
+
+        .preview-file i {
+            color: var(--primary-dark);
+            font-size: 1.5rem;
+            margin-right: 10px;
+        }
+
+        .preview-image img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 10px 15px;
+            border-radius: var(--border-radius);
+            border: none;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn i {
+            margin-right: 8px;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .btn-outline:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-error {
+            background-color: var(--error);
+            color: white;
+        }
+
+        .btn-error:hover {
+            background-color: #cc0000;
+        }
+
+        .btn-small {
+            padding: 5px 10px;
+            font-size: 0.9rem;
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+
+        /* Error messages */
+        .error-message {
+            color: var(--error);
+            font-size: 0.8rem;
+            margin-top: 5px;
+            display: none;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid var(--gray-200);
+        }
+
+        footer .quote {
+            font-style: italic;
+            color: var(--primary-dark);
+            margin-bottom: 10px;
+        }
+
+        footer .copyright {
+            font-size: 0.9rem;
+            color: var(--gray-600);
+        }
+
+        @media (max-width: 768px) {
+    .main-container {
+        margin-left: 0;
+        padding: 10px;
+    }
+    
+    .content-wrapper {
+        padding: 0 10px;
+    }
+    
+    .address-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .form-row {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .profile-form {
+        padding: 20px;
+    }
+}
+
+@media (min-width: 1200px) {
+    .main-container {
+        padding: 20px 40px;
+    }
+}
+.toast {
+            position: fixed;
+            bottom: -100px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 400px;
+            background: var(--success);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            box-shadow: var(--card-shadow);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            opacity: 0;
+        }
+
+        .toast.active {
+            bottom: 20px;
+            opacity: 1;
+        }
+
+        .toast.error {
+            background: var(--error);
+        }
+
+        .toast .close {
+            cursor: pointer;
+            margin-left: 15px;
+        }
+#wasteOptions {
+        display: block !important; /* Always show options */
+        position: static;
+        border: none;
+        box-shadow: none;
+        max-height: none;
+    }
+
+    #wasteOptions label {
+        display: flex !important;
+        align-items: center;
+        padding: 8px 15px;
+        background: var(--gray-100);
+        margin: 2px 0;
+        border-radius: 4px;
+    }
+
+    #wasteOptions label:hover {
+        background: var(--gray-200);
+    }
+
+    #wasteOptions input[type="checkbox"] {
+        margin-right: 10px;
+    }
+
+    /* Improved Toast Visibility */
+    .toast {
+        display: none;
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 90%;
+        max-width: 400px;
+        background: var(--success);
+        color: white;
+        padding: 15px;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        z-index: 1000;
+    }
+
+    .toast.active {
+        display: flex;
+        animation: slideIn 0.3s ease-out;
+    }
+
+    @keyframes slideIn {
+        from { bottom: -100px; opacity: 0; }
+        to { bottom: 20px; opacity: 1; }
+    }
+    </style>
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="logo">
+            <img src="https://via.placeholder.com/50" alt="Logo">
+            <h2>PrakritiKriti</h2>
+        </div>
+        <nav>
+            <ul>
+                <li class="active"><i class="fas fa-user"></i> Profile</li>
+                <li><i class="fas fa-seedling"></i> Dashboard</li>
+                <li><i class="fas fa-leaf"></i> Marketplace</li>
+                <li><i class="fas fa-recycle"></i> Waste Management</li>
+                <li><i class="fas fa-chart-line"></i> Analytics</li>
+                <li><i class="fas fa-cog"></i> Settings</li>
+            </ul>
+        </nav>
+        <div class="sidebar-footer">
+            <p class="quote">"Nurturing Waste into Worth"</p>
+        </div>
+    </aside>
+    <div class="main-container">
+        <div class="content-wrapper">
+            <header>
+                <h1>Artisan Profile</h1>
+                <div class="user-menu">
+                    <span>Welcome, Artisan</span>
+                    <img src="https://via.placeholder.com/40" alt="User" class="avatar">
+                </div>
+            </header>
+            <!-- <h1>Artisan Profile</h1>
+            <div class="user-menu">
+                <span>Welcome, Artisan</span>
+                <img src="https://via.placeholder.com/40" alt="User" class="avatar">
+            </div> -->
+        </header>
+
+        <form id="artisanForm" class="profile-form">
+            <!-- Basic Information Section -->
+            <div class="section-header">
+                <i class="fas fa-user"></i>
+                <h2>Contact Information</h2>
+            </div>
+            <div class="form-group">
+                <label for="industryName">Industry Name</label>
+                <input type="text" id="industryName" placeholder="Enter your industry name" required>
+                <div class="error-message" id="industryNameError">Please enter industry name</div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="fullName">Full Name</label>
+                    <input type="text" id="fullName" placeholder="Enter your full name" required>
+                    <div class="error-message" id="fullNameError">Please enter your full name</div>
+                </div>
+                <div class="form-group">
+                    <label for="mobile">Mobile Number</label>
+                    <div class="verified-input">
+                        <input type="tel" id="mobile" placeholder="+91 9876543210" required>
+                        <span class="verified-badge"><i class="fas fa-check-circle"></i> Verified</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" placeholder="Enter your email address" required>
+                <div class="error-message" id="emailError">Please enter a valid email address</div>
+            </div>
+
+            <!-- Address Section -->
+            <div class="section-header" style="margin-top: 30px;">
+                <i class="fas fa-map-marker-alt"></i>
+                <h2>Location Details</h2>
+            </div>
+            
+            <div class="address-grid">
+                <div class="form-group">
+                    <label for="village">Village Name</label>
+                    <input type="text" id="village" placeholder="Enter village name" required>
+                    <div class="error-message" id="villageError">Please enter your village</div>
+                </div>
+                <div class="form-group">
+                    <label for="city">City</label>
+                    <input type="text" id="city" placeholder="Enter city" required>
+                    <div class="error-message" id="cityError">Please enter your city</div>
+                </div>
+                <div class="form-group">
+                    <label for="state">State</label>
+                    <input type="text" id="state" placeholder="Enter state" required>
+                    <div class="error-message" id="stateError">Please enter your state</div>
+                </div>
+            </div>
+
+            <!-- Craft & Pricing Section -->
+            <div class="section-header" style="margin-top: 30px;">
+                <i class="fas fa-handshake"></i>
+                <h2>Craft & Pricing Details</h2>
+            </div>
+            
+            <div class="form-group">
+                <label for="craftType">Type of Craft</label>
+                <input type="text" id="craftType" placeholder="What type of craft do you make?" required>
+                <div class="error-message" id="craftTypeError">Please describe your craft</div>
+            </div>
+
+            <div class="form-group">
+                <label>Accepted Waste Types</label>
+                <div class="multi-select">
+                    <div class="selected-tags" id="selectedWasteTypes"></div>
+                    <!-- <div class="dropdown">
+                        <input type="text" id="wasteSearch" placeholder="Search waste types..."> -->
+                        <div class="dropdown-menu" id="wasteOptions">
+                            <label><input type="checkbox" value="banana-stem"> Banana Stem</label>
+                            <label><input type="checkbox" value="coconut-husk"> Coconut Husk</label>
+                            <label><input type="checkbox" value="rice-husk"> Rice Husk</label>
+                            <label><input type="checkbox" value="sugarcane-waste"> Sugarcane Waste</label>
+                            <label><input type="checkbox" value="other"> Other</label>
+                        </div>
+                    <!-- </div> -->
+                    <div class="other-waste-container" id="otherWasteContainer">
+                        <input type="text" id="otherWasteInput" 
+                               placeholder="Specify other waste type" 
+                               class="validation-error">
+                        <div class="error-message" id="otherWasteError">
+                            Please specify the other waste type
+                        </div>
+                    </div>
+                </div>
+            </div>
+    
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="price">Product Price</label>
+                    <div class="price-input">
+                        <input type="number" id="price" placeholder="Enter price" min="1000" step="100" required>
+                        <select id="priceUnit" required>
+                            <option value="">Select unit</option>
+                            <option value="piece">Per Piece</option>
+                            <option value="kg">Per Kg</option>
+                            <option value="set">Per Set</option>
+                        </select>
+                    </div>
+                    <div class="error-message" id="priceError">Price must be ₹1000 or more</div>
+                </div>
+            </div>
+
+            <!-- Additional Information -->
+            <div class="section-header" style="margin-top: 30px;">
+                <i class="fas fa-info-circle"></i>
+                <h2>Additional Details</h2>
+            </div>
+            
+            <div class="form-group">
+                <label for="additionalInfo">Craft Process & Materials</label>
+                <textarea id="additionalInfo" rows="4" placeholder="Describe your craft process and materials used"></textarea>
+            </div>
+
+            <div class="form-actions">
+                <button type="button" class="btn btn-outline" id="resetBtn">Reset</button>
+                <button type="submit" class="btn btn-primary" id="saveBtn">Save Profile</button>
+            </div>
+        </form>
+
+        <footer>
+            <p class="quote">"Transforming Waste into Beautiful Crafts"</p>
+            <p class="copyright">© 2025 PrakritiKriti. All rights reserved.</p>
+        </footer>
+    </div>
+            <!-- Form content remains same... -->
+            
+        </div>
+    </div>
+
+    
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const firebaseConfig = {
+            apiKey: "AIzaSyCgvhMdnHX9yVvMBJdh3uaBYbUIdPtD9_k",
+            authDomain: "prakritikriti-d5603.firebaseapp.com",
+            databaseURL: "https://prakritikriti-d5603-default-rtdb.firebaseio.com",
+            projectId: "prakritikriti-d5603",
+            storageBucket: "prakritikriti-d5603.appspot.com",
+            messagingSenderId: "1050876813362",
+            appId: "1:1050876813362:web:38ffd26d667ff4a8dddc2b"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        const auth = firebase.auth();
+
+        // DOM Elements
+        const otherCheckbox = document.querySelector('input[value="other"]');
+        const otherContainer = document.getElementById('otherWasteContainer');
+        const otherInput = document.getElementById('otherWasteInput');
+        const toast = document.querySelector('.toast');
+        const sidebarLinks = document.querySelectorAll('.sidebar li');
+
+        // Initialize Sidebar
+        function setActiveSidebarLink() {
+            const currentPage = window.location.pathname.split('/').pop();
+            sidebarLinks.forEach(link => {
+                if (link.textContent.toLowerCase().includes(currentPage)) {
+                    link.classList.add('active');
+                } else {
+                    link.classList.remove('active');
+                }
+            });
+        }
+
+        // Waste Type Handlers
+        function handleOtherWaste() {
+            otherContainer.classList.toggle('show', otherCheckbox.checked);
+            if (!otherCheckbox.checked) otherInput.value = '';
+            updateSelectedTags();
+        }
+
+        function updateSelectedTags() {
+            const tagsContainer = document.getElementById('selectedWasteTypes');
+            tagsContainer.innerHTML = Array.from(document.querySelectorAll('#wasteOptions input:checked'))
+                .map(checkbox => {
+                    const value = checkbox.value === 'other' ? 
+                                `Other: ${otherInput.value.trim()}` : 
+                                checkbox.parentElement.textContent.trim();
+                    return `
+                        <span class="tag">
+                            ${value}
+                            <i class="fas fa-times" data-value="${checkbox.value}"></i>
+                        </span>
+                    `;
+                }).join('');
+        }
+
+        // Tag Removal Handler
+        document.getElementById('selectedWasteTypes').addEventListener('click', (e) => {
+            if (e.target.classList.contains('fa-times')) {
+                const value = e.target.dataset.value;
+                const checkbox = document.querySelector(`input[value="${value}"]`);
+                if (checkbox) {
+                    checkbox.checked = false;
+                    if (value === 'other') {
+                        otherContainer.classList.remove('show');
+                        otherInput.value = '';
+                    }
+                    updateSelectedTags();
+                }
+            }
+        });
+
+        // Form Validation
+        function validateForm() {
+            let isValid = true;
+
+            // Other Waste Validation
+            if (otherCheckbox.checked && !otherInput.value.trim()) {
+                otherInput.classList.add('validation-error');
+                document.getElementById('otherWasteError').style.display = 'block';
+                isValid = false;
+            } else {
+                otherInput.classList.remove('validation-error');
+                document.getElementById('otherWasteError').style.display = 'none';
+            }
+
+            // Required Field Validation
+            const requiredFields = [
+                '#industryName', '#fullName', '#mobile', '#email',
+                '#village', '#city', '#state', '#craftType', '#price', '#priceUnit'
+            ];
+
+            requiredFields.forEach(selector => {
+                const field = document.querySelector(selector);
+                const error = document.querySelector(`${selector}Error`);
+                if (!field.value.trim()) {
+                    field.classList.add('validation-error');
+                    error.style.display = 'block';
+                    isValid = false;
+                } else {
+                    field.classList.remove('validation-error');
+                    error.style.display = 'none';
+                }
+            });
+
+            return isValid;
+        }
+
+        // Save Handler
+        async function saveProfile(e) {
+            e.preventDefault();
+            if (!validateForm()) return;
+
+            try {
+                const user = auth.currentUser;
+                if (!user) throw new Error('User not authenticated');
+                const wasteTypes = Array.from(document.querySelectorAll('#wasteOptions input:checked'))
+                        .map(checkbox => {
+                            if (checkbox.value === 'other') {
+                                const otherValue = document.getElementById('otherWasteInput').value.trim();
+                                return otherValue ? `other:${otherValue}` : null;
+                            }
+                            return checkbox.value;
+                        })
+                        .filter(value => value !== null);
+
+                const artisanData = {
+                    industryName: document.getElementById('industryName').value.trim(),
+                    contact: {
+                        name: document.getElementById('fullName').value.trim(),
+                        mobile: document.getElementById('mobile').value.trim(),
+                        email: document.getElementById('email').value.trim()
+                    },
+                    location: {
+                        village: document.getElementById('village').value.trim(),
+                        city: document.getElementById('city').value.trim(),
+                        state: document.getElementById('state').value.trim()
+                    },
+                    craft: {
+                        type: document.getElementById('craftType').value.trim(),
+                        wasteTypes: Array.from(document.querySelectorAll('#wasteOptions input:checked'))
+                                      .map(checkbox => 
+                                          checkbox.value === 'other' ? 
+                                          `other:${otherInput.value.trim()}` : 
+                                          checkbox.value),
+                        price: {
+                            amount: parseFloat(document.getElementById('price').value),
+                            unit: document.getElementById('priceUnit').value
+                        },
+                        details: document.getElementById('additionalInfo').value.trim()
+                    },
+                    timestamp: firebase.database.ServerValue.TIMESTAMP
+                };
+
+                await database.ref(`artisans/${user.uid}`).set(artisanData);
+                showToast('Profile saved successfully!');
+            } catch (error) {
+                showToast(`Error: ${error.message}`, true);
+                console.error('Save error:', error);
+            }
+        }
+
+        // Load Profile Data
+        function loadProfileData(userId) {
+            database.ref(`artisans/${userId}`).once('value').then(snapshot => {
+                const data = snapshot.val();
+                if (data) {
+                    // Basic Info
+                    document.getElementById('industryName').value = data.industryName || '';
+                    document.getElementById('fullName').value = data.contact?.name || '';
+                    document.getElementById('mobile').value = data.contact?.mobile || '';
+                    document.getElementById('email').value = data.contact?.email || '';
+
+                    // Location
+                    document.getElementById('village').value = data.location?.village || '';
+                    document.getElementById('city').value = data.location?.city || '';
+                    document.getElementById('state').value = data.location?.state || '';
+
+                    // Craft Info
+                    document.getElementById('craftType').value = data.craft?.type || '';
+                    document.getElementById('price').value = data.craft?.price?.amount || '';
+                    document.getElementById('priceUnit').value = data.craft?.price?.unit || '';
+                    document.getElementById('additionalInfo').value = data.craft?.details || '';
+
+                    // Waste Types
+                    data.craft?.wasteTypes?.forEach(waste => {
+                        const [type, value] = waste.split(':');
+                        const checkbox = type === 'other' ? 
+                            document.querySelector('input[value="other"]') :
+                            document.querySelector(`input[value="${waste}"]`);
+
+                        if (checkbox) {
+                            checkbox.checked = true;
+                            if (type === 'other') {
+                                otherInput.value = value?.trim() || '';
+                                otherContainer.classList.add('show');
+                            }
+                        }
+                    });
+                    updateSelectedTags();
+                }
+            });
+        }
+
+        // Event Listeners
+        otherCheckbox.addEventListener('change', handleOtherWaste);
+        document.getElementById('wasteSearch').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            document.querySelectorAll('#wasteOptions label').forEach(label => {
+                const text = label.textContent.toLowerCase();
+                label.style.display = text.includes(searchTerm) ? 'block' : 'none';
+            });
+        });
+
+        document.getElementById('resetBtn').addEventListener('click', (e) => {
+            e.preventDefault();
+            if (confirm('Reset all changes?')) {
+                document.getElementById('artisanForm').reset();
+                document.querySelectorAll('#wasteOptions input').forEach(checkbox => 
+                    checkbox.checked = false);
+                otherContainer.classList.remove('show');
+                updateSelectedTags();
+                showToast('Form reset successfully');
+            }
+        });
+
+        document.getElementById('artisanForm').addEventListener('submit', saveProfile);
+
+        // Auth State Listener
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                loadProfileData(user.uid);
+                setActiveSidebarLink();
+            } else {
+                window.location.href = '/login.html';
+            }
+        });
+
+        // Toast Notification
+        function showToast(message, isError = false) {
+            const toast = document.getElementById('toast');
+            toast.querySelector('.message').textContent = message;
+            toast.classList.remove('error', 'active');
+            
+            if(isError) {
+                toast.classList.add('error');
+            }
+            
+            toast.classList.add('active');
+            setTimeout(() => toast.classList.remove('active'), 3000);
+        }
+    });
+</script>
+        
+         <!-- Updated toast notification -->
+         <div class="toast" id="toast">
+            <span class="message">Details saved successfully!</span>
+            <span class="close" onclick="this.parentElement.classList.remove('active')">
+                <i class="fas fa-times"></i>
+            </span>
+        </div>
+    </div>
+</body>
+</html>

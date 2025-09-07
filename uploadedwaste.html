@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Uploaded Waste - PrakritiKriti</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
+    <style>
+        :root {
+            --primary-color: #4caf50;
+            --primary-dark: #087f23;
+            --background-color: #f8f7f2;
+            --card-background: #ffffff;
+            --text-color: #333333;
+            --border-radius: 12px;
+            --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Nunito', sans-serif;
+        }
+
+        body {
+            background-color: var(--background-color);
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .back-btn {
+            color: var(--primary-color);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .waste-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .waste-card {
+            background: var(--card-background);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            box-shadow: var(--box-shadow);
+        }
+
+        .waste-type {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+        }
+
+        .waste-details {
+            margin-top: 15px;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+
+        .label {
+            color: var(--text-color);
+            font-weight: 600;
+        }
+
+        .value {
+            color: #666;
+        }
+
+        .no-waste {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .total-summary {
+            background: var(--card-background);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: var(--box-shadow);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+
+        .summary-item {
+            text-align: center;
+        }
+
+        .summary-label {
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .summary-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .delete-btn {
+            background: #ff4444;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-top: 10px;
+        }
+
+        .delete-btn:hover {
+            background: #cc0000;
+        }
+
+        .filters {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .filter-group label {
+            font-weight: 600;
+            color: var(--text-color);
+        }
+
+        .filter-group select {
+            padding: 8px 12px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            min-width: 150px;
+        }
+
+        .status-tag {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .status-collected {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .status-not-collected {
+            background-color: #ffebee;
+            color: #c62828;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Uploaded Waste History</h1>
+            <a href="#" class="back-btn" id="backBtn">
+                <i class="fas fa-arrow-left"></i>
+                Back to Dashboard
+            </a>
+        </div>
+
+        <!-- Add Filters -->
+        <div class="filters">
+            <div class="filter-group">
+                <label>Waste Type:</label>
+                <select id="typeFilter">
+                    <option value="all">All Types</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>Status:</label>
+                <select id="statusFilter">
+                    <option value="all">All Statuses</option>
+                    <option value="collected">Collected</option>
+                    <option value="not-collected">Not Collected</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="total-summary" id="totalSummary">
+            <!-- Summary will be populated dynamically -->
+        </div>
+
+        <div class="waste-grid" id="wasteGrid">
+            <!-- Waste cards will be populated dynamically -->
+        </div>
+    </div>
+
+    <script>
+        // Initialize Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyCgvhMdnHX9yVvMBJdh3uaBYbUIdPtD9_k",
+            authDomain: "prakritikriti-d5603.firebaseapp.com",
+            databaseURL: "https://prakritikriti-d5603-default-rtdb.firebaseio.com",
+            projectId: "prakritikriti-d5603",
+            storageBucket: "prakritikriti-d5603.firebasestorage.app",
+            messagingSenderId: "1050876813362",
+            appId: "1:1050876813362:web:38ffd26d667ff4a8dddc2b"
+        };
+
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const database = firebase.database();
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const userInfo = JSON.parse(sessionStorage.getItem('userInfo'));
+            if (!userInfo || !userInfo.ID) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            // Set back button href
+            const backBtn = document.getElementById('backBtn');
+            backBtn.href = `demodash.html?ID=${userInfo.ID}`;
+
+            // Load waste history
+            loadWasteHistory(userInfo.ID);
+
+            // Add filter event listeners
+            document.getElementById('typeFilter').addEventListener('change', () => loadWasteHistory(userInfo.ID));
+            document.getElementById('statusFilter').addEventListener('change', () => loadWasteHistory(userInfo.ID));
+        });
+
+        function loadWasteHistory(farmerID) {
+            const uploadsRef = database.ref(`uploads/${farmerID}`);
+            const typeFilter = document.getElementById('typeFilter').value;
+            const statusFilter = document.getElementById('statusFilter').value;
+
+            uploadsRef.on('value', (snapshot) => {
+                const uploads = snapshot.val();
+                const wasteGrid = document.getElementById('wasteGrid');
+                const totalSummary = document.getElementById('totalSummary');
+                const typeFilterSelect = document.getElementById('typeFilter');
+
+                // Populate type filter options
+                const uniqueTypes = new Set();
+                if (uploads) {
+                    Object.values(uploads).forEach(upload => {
+                        uniqueTypes.add(upload.wasteType);
+                    });
+                }
+                populateTypeFilter([...uniqueTypes], typeFilterSelect);
+
+                // Filter and process data
+                let totalQuantity = 0;
+                let totalValue = 0;
+                let totalEntries = 0;
+                wasteGrid.innerHTML = '';
+
+                if (uploads) {
+                    Object.entries(uploads).forEach(([key, upload]) => {
+                        // Apply filters
+                        const matchesType = typeFilter === 'all' || upload.wasteType === typeFilter;
+                        const matchesStatus = (
+                            statusFilter === 'all' ||
+                            (statusFilter === 'collected' && upload.status === 'collected') ||
+                            (statusFilter === 'not-collected' && upload.status !== 'collected')
+                        );
+
+                        if (matchesType && matchesStatus) {
+                            totalQuantity += parseInt(upload.quantity) || 0;
+                            totalValue += (parseInt(upload.quantity) || 0) * (parseInt(upload.pricePerKg) || 0);
+                            totalEntries++;
+
+                            const wasteCard = createWasteCard(key, upload);
+                            wasteGrid.appendChild(wasteCard);
+                        }
+                    });
+                }
+
+                // Update summary
+                totalSummary.innerHTML = `
+                    <div class="summary-item">
+                        <div class="summary-label">Total Entries</div>
+                        <div class="summary-value">${totalEntries}</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-label">Total Quantity</div>
+                        <div class="summary-value">${totalQuantity} KG</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-label">Total Value</div>
+                        <div class="summary-value">₹${totalValue.toLocaleString()}</div>
+                    </div>
+                `;
+                totalSummary.style.display = totalEntries ? 'flex' : 'none';
+            });
+        }
+
+        function populateTypeFilter(types, selectElement) {
+            const existingOptions = [...selectElement.options].map(opt => opt.value);
+            types.forEach(type => {
+                if (!existingOptions.includes(type)) {
+                    const option = document.createElement('option');
+                    option.value = type;
+                    option.textContent = formatWasteType(type);
+                    selectElement.appendChild(option);
+                }
+            });
+        }
+
+        function createWasteCard(key, upload) {
+            const div = document.createElement('div');
+            div.className = 'waste-card';
+
+            const timestamp = new Date(upload.timestamp).toLocaleString();
+            const totalValue = (upload.quantity || 0) * (upload.pricePerKg || 0);
+            const status = upload.status || 'not-collected';
+
+            div.innerHTML = `
+                <div class="waste-type">
+                    ${formatWasteType(upload.wasteType)}
+                    <span class="status-tag ${status === 'collected' ? 'status-collected' : 'status-not-collected'}">
+                        ${status === 'collected' ? 'Collected' : 'Not Collected'}
+                    </span>
+                </div>
+                <div class="waste-details">
+                    <div class="detail-row">
+                        <span class="label">Quantity</span>
+                        <span class="value">${upload.quantity || 0} KG</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="label">Price per KG</span>
+                        <span class="value">₹${upload.pricePerKg || 0}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="label">Total Value</span>
+                        <span class="value">₹${totalValue}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="label">Uploaded On</span>
+                        <span class="value">${timestamp}</span>
+                    </div>
+                    <button class="delete-btn" onclick="deleteWaste('${key}', '${upload.status}')">
+                        <i class="fas fa-trash"></i> Delete Entry
+                    </button>
+                </div>
+            `;
+            return div;
+        }
+
+        function formatWasteType(type) {
+            return type.split('_')
+                .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+                .join(' ');
+        }
+
+        function deleteWaste(key, status) {
+            if (status === 'collected' && !confirm('This entry is marked as collected. Are you sure you want to delete it?')) {
+                return;
+            }
+
+            if (confirm('Are you sure you want to delete this waste entry?')) {
+                const userInfo = JSON.parse(sessionStorage.getItem('userInfo'));
+                const farmerID = userInfo?.ID;
+
+                if (!farmerID) {
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                const uploadRef = database.ref(`uploads/${farmerID}/${key}`);
+
+                uploadRef.remove()
+                    .then(() => {
+                        showToast('Waste entry deleted successfully');
+                    })
+                    .catch(error => {
+                        console.error('Delete error:', error);
+                        alert('Error deleting waste entry');
+                    });
+            }
+        }
+
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.style.cssText = `
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                background: #4caf50;
+                color: white;
+                padding: 12px 24px;
+                border-radius: 4px;
+                box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            `;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+    </script>
+</body>
+
+</html>

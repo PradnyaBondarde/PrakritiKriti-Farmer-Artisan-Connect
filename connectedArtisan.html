@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connected Artisans - PrakritiKriti</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
+    <style>
+        :root {
+            --primary-color: #4caf50;
+            --primary-dark: #087f23;
+            --background-color: #f8f7f2;
+            --card-background: #ffffff;
+            --text-color: #333333;
+            --border-radius: 12px;
+            --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: var(--background-color);
+            margin: 0;
+            padding: 0;
+        }
+
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: 280px;
+            background-color: var(--card-background);
+            box-shadow: var(--box-shadow);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100vh;
+            left: 0;
+            top: 0;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .sidebar-header img {
+            width: 40px;
+            height: 40px;
+        }
+
+        .sidebar-header h2 {
+            margin: 0;
+            color: var(--primary-color);
+            font-size: 1.5rem;
+        }
+
+        .sidebar-nav {
+            padding: 20px 0;
+            flex-grow: 1;
+        }
+
+        .sidebar-nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .sidebar-nav li {
+            margin-bottom: 5px;
+        }
+
+        .sidebar-nav a {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            color: var(--text-color);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            gap: 10px;
+        }
+
+        .sidebar-nav a:hover,
+        .sidebar-nav li.active a {
+            background-color: rgba(76, 175, 80, 0.1);
+            color: var(--primary-color);
+        }
+
+        .sidebar-nav i {
+            width: 20px;
+        }
+
+        .sidebar-footer {
+            padding: 20px;
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .logout-btn {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            background-color: #f44336;
+            color: white;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: background-color 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background-color: #d32f2f;
+        }
+
+        /* Main Content Styles */
+        .main-content {
+            flex-grow: 1;
+            margin-left: 280px;
+            padding: 20px;
+        }
+
+        .content-header {
+            display: flex;
+            align-items: center;
+        }
+
+        .search-container {
+            position: relative;
+            width: 300px;
+        }
+
+        .search-container input {
+            width: 100%;
+            padding: 10px 15px;
+            padding-left: 40px;
+            border: 1px solid var(--gray-300);
+            border-radius: var(--border-radius);
+            font-size: 14px;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray-500);
+        }
+
+        .view-toggle {
+            margin-left: 20px;
+        }
+
+        .view-select {
+            padding: 10px 15px;
+            border: 1px solid var(--primary-color);
+            border-radius: var(--border-radius);
+            font-family: 'Nunito', sans-serif;
+            font-size: 14px;
+            color: var(--text-color);
+            background-color: white;
+            cursor: pointer;
+        }
+
+        .content-body {
+            padding: 20px;
+            background: var(--card-background);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+        }
+
+        .artisans-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .artisan-card {
+            background: var(--card-background);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            box-shadow: var(--box-shadow);
+            transition: transform 0.3s ease;
+        }
+
+        .artisan-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .artisan-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .artisan-icon {
+            width: 50px;
+            height: 50px;
+            background: rgba(76, 175, 80, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-color);
+        }
+
+        .artisan-info h3 {
+            margin: 0;
+            color: var(--text-color);
+        }
+
+        .artisan-info p {
+            margin: 5px 0;
+            color: #666;
+        }
+
+        .artisan-details {
+            margin-top: 15px;
+        }
+
+        .detail-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .detail-item i {
+            color: var(--primary-color);
+            width: 20px;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .view-btn,
+        .message-btn,
+        .connect-btn {
+            padding: 8px 15px;
+            border-radius: var(--border-radius);
+            border: none;
+            cursor: pointer;
+            font-family: 'Nunito', sans-serif;
+            transition: background-color 0.3s ease;
+            flex: 1;
+        }
+
+        .view-btn {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .message-btn {
+            background-color: transparent;
+            border: 1px solid var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .connect-btn {
+            padding: 8px 15px;
+            border-radius: var(--border-radius);
+            border: none;
+            cursor: pointer;
+            font-family: 'Nunito', sans-serif;
+            transition: all 0.3s ease;
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .connect-btn.connected {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .connect-btn.pending {
+            background-color: #ffc107;
+            color: #000;
+        }
+
+        .connect-btn:disabled {
+            cursor: not-allowed;
+            opacity: 0.8;
+        }
+
+        .connect-btn.pending:disabled {
+            opacity: 1;
+        }
+
+        .connect-btn.connected:disabled {
+            opacity: 1;
+        }
+
+        .view-btn:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .message-btn:hover {
+            background-color: rgba(76, 175, 80, 0.1);
+        }
+
+        .connect-btn:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .connect-btn.connected {
+            background-color: gray;
+            cursor: not-allowed;
+        }
+
+        .connect-btn.pending {
+            background-color: orange;
+            cursor: not-allowed;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            display: none;
+            z-index: 1000;
+        }
+
+        .toast.show {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+
+        .filter-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            gap: 20px;
+        }
+
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .filter-select {
+            padding: 8px 12px;
+            border-radius: var(--border-radius);
+            border: 1px solid var(--primary-color);
+            min-width: 200px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <img src="logo.jpg" alt="PrakritiKriti Logo" class="logo">
+                <h2>PrakritiKriti</h2>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li><a href="#" onclick="handleDashboardClick(event)"><i class="fas fa-home"></i> Dashboard</a></li>
+                    <li class="active"><a href="connectedArtisan.html"><i class="fas fa-user-friends"></i> Artisans</a>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <button id="logoutBtn" class="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Search and Header -->
+            <!-- <div class="content-header">
+                <div class="search-container">
+                    <input type="text" id="searchInput" placeholder="Search artisans...">
+                    <i class="fas fa-search search-icon"></i>
+                </div>
+            </div> -->
+
+            <!-- Rest of your existing container content -->
+            <div class="content-body">
+                <h1>Available Artisans</h1>
+                <!-- Your existing filter-container and artisans-grid here -->
+                <div class="artisans-grid" id="artisansContainer">
+                    <!-- Artisans will be loaded here dynamically -->
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Initialize Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyCgvhMdnHX9yVvMBJdh3uaBYbUIdPtD9_k",
+            authDomain: "prakritikriti-d5603.firebaseapp.com",
+            databaseURL: "https://prakritikriti-d5603-default-rtdb.firebaseio.com",
+            projectId: "prakritikriti-d5603",
+            storageBucket: "prakritikriti-d5603.firebasestorage.app",
+            messagingSenderId: "1050876813362",
+            appId: "1:1050876813362:web:38ffd26d667ff4a8dddc2b"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const userInfo = JSON.parse(sessionStorage.getItem('userInfo'));
+            if (!userInfo) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            // Update header text
+            document.querySelector('h1').textContent = 'Available Artisans';
+
+            // Load all artisans
+            loadAllArtisans();
+
+            // Add filters
+            addArtisanFilters();
+        });
+
+        // Search functionality
+        document.getElementById('searchInput').addEventListener('input', function (e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const artisanCards = document.querySelectorAll('.artisan-card');
+
+            artisanCards.forEach(card => {
+                const name = card.querySelector('.artisan-info h3').textContent.toLowerCase();
+                const industry = card.querySelector('.detail-item:first-child span').textContent.toLowerCase();
+                const location = card.querySelector('.detail-item:nth-child(2) span').textContent.toLowerCase();
+                const wasteType = card.querySelector('.detail-item:last-child span').textContent.toLowerCase();
+
+                if (name.includes(searchTerm) ||
+                    industry.includes(searchTerm) ||
+                    location.includes(searchTerm) ||
+                    wasteType.includes(searchTerm)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        });
+
+        // Logout functionality
+        document.getElementById('logoutBtn').addEventListener('click', function () {
+            sessionStorage.clear();
+            window.location.href = 'login.html';
+        });
+
+        function loadAllArtisans() {
+            const userInfo = JSON.parse(sessionStorage.getItem('userInfo'));
+            if (!userInfo) return;
+
+            const artisansRef = database.ref('artisans');
+            const artisansContainer = document.getElementById('artisansContainer');
+
+            artisansRef.on('value', (snapshot) => {
+                const artisans = snapshot.val();
+                artisansContainer.innerHTML = ''; // Clear existing content
+
+                if (!artisans) {
+                    artisansContainer.innerHTML = `
+                        <div style="text-align: center; grid-column: 1/-1; padding: 20px;">
+                            <p>No artisans available.</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                // Get existing connections to check status
+                const connectionsRef = database.ref(`connections/${userInfo.ID}`);
+                connectionsRef.once('value', (connectionsSnapshot) => {
+                    const connections = connectionsSnapshot.val() || {};
+
+                    Object.entries(artisans).forEach(([artisanID, artisanData]) => {
+                        // Don't show the current user if they're an artisan
+                        if (artisanID !== userInfo.ID) {
+                            const artisanCard = createArtisanCard(artisanID, artisanData);
+                            artisansContainer.appendChild(artisanCard);
+                        }
+                    });
+                });
+            });
+        }
+
+        function loadConnectedArtisans() {
+            const userInfo = JSON.parse(sessionStorage.getItem('userInfo'));
+            if (!userInfo) return;
+
+            const connectionsRef = database.ref(`connections/${userInfo.ID}/connections`);
+            const artisansContainer = document.getElementById('artisansContainer');
+
+            connectionsRef.on('value', async (snapshot) => {
+                const connections = snapshot.val();
+                artisansContainer.innerHTML = '';
+
+                if (!connections || Object.keys(connections).length === 0) {
+                    artisansContainer.innerHTML = `
+                        <div style="text-align: center; grid-column: 1/-1; padding: 20px;">
+                            <p>No connected artisans yet.</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                // Fetch and display connected artisans
+                for (const artisanID of Object.keys(connections)) {
+                    const artisanRef = database.ref(`artisans/${artisanID}`);
+                    const artisanSnapshot = await artisanRef.once('value');
+                    const artisanData = artisanSnapshot.val();
+
+                    if (artisanData) {
+                        const card = createArtisanCard(artisanID, artisanData);
+                        const connectBtn = card.querySelector('.connect-btn');
+                        connectBtn.textContent = 'Connected';
+                        connectBtn.disabled = true;
+                        connectBtn.classList.add('connected');
+                        artisansContainer.appendChild(card);
+                    }
+                }
+            });
+        }
+
+        function addArtisanFilters() {
+            const filterContainer = document.createElement('div');
+            filterContainer.className = 'filter-container';
+            filterContainer.style.display = 'flex';
+            filterContainer.style.justifyContent = 'flex-end';
+            filterContainer.style.alignItems = 'center';
+
+            filterContainer.innerHTML = `
+                <div class="filter-group">
+                    <label for="connectionStatus">Filter by Status:</label>
+                    <select id="connectionStatus" class="filter-select">
+                        <option value="">All Status</option>
+                        <option value="connected">Connected</option>
+                        <option value="pending">Request Pending</option>
+                        <option value="none">Not Connected</option>
+                    </select>
+                </div>
+            `;
+
+            // Insert filter before the artisans grid
+            const contentBody = document.querySelector('.content-body');
+            contentBody.insertBefore(filterContainer, document.getElementById('artisansContainer'));
+
+            // Add filter functionality for connection status only
+            document.getElementById('connectionStatus').addEventListener('change', updateFilters);
+        }
+
+        function updateFilters() {
+            const selectedStatus = document.getElementById('connectionStatus').value;
+            const artisanCards = document.querySelectorAll('.artisan-card');
+
+            artisanCards.forEach(card => {
+                const connectBtn = card.querySelector('.connect-btn');
+                let connectionStatus = 'none';
+
+                if (connectBtn.classList.contains('connected')) {
+                    connectionStatus = 'connected';
+                } else if (connectBtn.classList.contains('pending')) {
+                    connectionStatus = 'pending';
+                }
+
+                if (!selectedStatus || connectionStatus === selectedStatus) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        async function sendConnectionRequest(artisanID) {
+            const userInfo = JSON.parse(sessionStorage.getItem('userInfo'));
+            const farmerID = userInfo.ID;
+
+            try {
+                await database.ref(`artisanRequests/${artisanID}/received/${farmerID}`).set({
+                    farmerID: farmerID,
+                    farmerName: userInfo.username,
+                    status: 'pending',
+                    timestamp: Date.now(),
+                    message: 'Would like to connect for waste supply'
+                });
+
+                // Update UI
+                const connectionBtn = document.querySelector(`[data-artisan-id="${artisanID}"]`);
+                if (connectionBtn) {
+                    connectionBtn.textContent = 'Request Pending';
+                    connectionBtn.disabled = true;
+                    connectionBtn.classList.add('pending');
+                }
+                showToast('Connection request sent to artisan');
+            } catch (error) {
+                console.error('Error sending request:', error);
+                showToast('Error sending request');
+            }
+        }
+
+        async function checkConnectionStatus(artisanID) {
+            const userInfo = JSON.parse(sessionStorage.getItem('userInfo'));
+            const farmerID = userInfo.ID;
+
+            try {
+                const connectionsRef = database.ref(`connections/${farmerID}`);
+                const snapshot = await connectionsRef.once('value');
+                const data = snapshot.val();
+
+                if (data && data.connections && data.connections[artisanID]) {
+                    return 'connected';
+                }
+
+                const requestRef = database.ref(`artisanRequests/${artisanID}/received/${farmerID}`);
+                const requestSnapshot = await requestRef.once('value');
+                const requestData = requestSnapshot.val();
+
+                if (requestData && requestData.status === 'pending') {
+                    return 'pending';
+                }
+
+                return 'none';
+            } catch (error) {
+                console.error('Error checking connection status:', error);
+                return 'none'; // Return 'none' instead of 'error'
+            }
+        }
+
+        function updateConnectionButton(artisanID) {
+            const connectionBtn = document.querySelector(`[data-artisan-id="${artisanID}"]`);
+            if (!connectionBtn) return;
+
+            checkConnectionStatus(artisanID).then(status => {
+                switch (status) {
+                    case 'connected':
+                        connectionBtn.textContent = 'Connected';
+                        connectionBtn.disabled = true;
+                        connectionBtn.classList.remove('pending');
+                        connectionBtn.classList.add('connected');
+                        break;
+                    case 'pending':
+                        connectionBtn.textContent = 'Request Pending';
+                        connectionBtn.disabled = true;
+                        connectionBtn.classList.remove('connected');
+                        connectionBtn.classList.add('pending');
+                        break;
+                    case 'none':
+                        connectionBtn.textContent = 'Connect';
+                        connectionBtn.disabled = false;
+                        connectionBtn.classList.remove('connected', 'pending');
+                        break;
+                    case 'error':
+                        connectionBtn.textContent = 'Error';
+                        connectionBtn.disabled = true;
+                        break;
+                }
+            });
+        }
+
+        // Add real-time connection status updates
+        function listenToConnectionChanges(artisanID) {
+            const userInfo = JSON.parse(sessionStorage.getItem('userInfo'));
+            const farmerID = userInfo.ID;
+
+            // Listen to connections node
+            database.ref(`connections/${farmerID}/${artisanID}`).on('value', (snapshot) => {
+                updateConnectionButton(artisanID);
+            });
+
+            // Listen to connection requests node
+            database.ref(`connectionRequests/sent/${farmerID}/${artisanID}`).on('value', (snapshot) => {
+                updateConnectionButton(artisanID);
+            });
+        }
+
+        function listenToFarmerRequests() {
+            const userInfo = JSON.parse(sessionStorage.getItem('userInfo'));
+            const farmerID = userInfo.ID;
+
+            database.ref(`artisanRequests`).on('value', (snapshot) => {
+                const allRequests = snapshot.val() || {};
+                const farmerRequests = Object.entries(allRequests)
+                    .flatMap(([artisanID, requests]) =>
+                        Object.entries(requests.received || {})
+                            .filter(([key]) => key === farmerID)
+                    );
+
+                // Update UI with farmer-initiated request statuses
+                farmerRequests.forEach(([artisanID, request]) => {
+                    const connectionBtn = document.querySelector(`[data-artisan-id="${artisanID}"]`);
+                    if (connectionBtn) {
+                        if (request.status === 'pending') {
+                            connectionBtn.textContent = 'Request Pending';
+                            connectionBtn.disabled = true;
+                            connectionBtn.classList.add('pending');
+                        } else if (request.status === 'connected') {
+                            connectionBtn.textContent = 'Connected';
+                            connectionBtn.disabled = true;
+                            connectionBtn.classList.add('connected');
+                        }
+                    }
+                });
+            });
+        }
+
+        function createArtisanCard(artisanID, artisanData) {
+            const card = document.createElement('div');
+            card.className = 'artisan-card';
+
+            const basicInfo = artisanData.basic || {};
+            const marketDetails = artisanData.marketDetails || {};
+
+            card.innerHTML = `
+                <div class="artisan-header">
+                    <div class="artisan-icon">
+                        <i class="fas fa-user-circle"></i>
+                    </div>
+                    <div class="artisan-info">
+                        <h3>${basicInfo.fullName || 'Unnamed Artisan'}</h3>
+                        <p>ID: ${artisanID}</p>
+                    </div>
+                </div>
+                <div class="artisan-details">
+                    <div class="detail-item">
+                        <i class="fas fa-industry"></i>
+                        <span>${marketDetails.industryName || 'Industry not specified'}</span>
+                    </div>
+                    <div class="detail-item">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span>${basicInfo.village || ''}, ${basicInfo.district || 'Location not specified'}</span>
+                    </div>
+                    <div class="detail-item">
+                        <i class="fas fa-leaf"></i>
+                        <span>${marketDetails.wasteType || 'Waste type not specified'}</span>
+                    </div>
+                </div>
+                <div class="actions">
+                    <button class="connect-btn" data-artisan-id="${artisanID}" 
+                            onclick="sendConnectionRequest('${artisanID}')">
+                        Connect
+                    </button>
+                    <button class="view-btn" onclick="viewArtisanProfile('${artisanID}')">
+                        View Profile
+                    </button>
+                </div>
+            `;
+
+            // Add connection status listeners
+            listenToConnectionChanges(artisanID);
+
+            return card;
+        }
+
+        function viewArtisanProfile(artisanID) {
+            window.location.href = `viewProfileofArtisan.html?artisanID=${artisanID}`;
+        }
+
+        function messageArtisan(artisanID) {
+            // Implement messaging functionality
+            alert('Messaging feature coming soon!');
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const viewToggle = document.getElementById('viewToggle');
+            viewToggle.addEventListener('change', function (e) {
+                const selectedView = e.target.value;
+                document.querySelector('h1').textContent =
+                    selectedView === 'connected' ? 'Connected Artisans' : 'Available Artisans';
+
+                if (selectedView === 'connected') {
+                    loadConnectedArtisans();
+                } else {
+                    loadAllArtisans();
+                }
+            });
+            listenToFarmerRequests();
+        });
+
+        function handleDashboardClick(event) {
+            event.preventDefault();
+            const userInfo = JSON.parse(sessionStorage.getItem('userInfo'));
+            if (userInfo && userInfo.ID) {
+                window.location.href = `demodash.html?ID=${userInfo.ID}`;
+            } else {
+                window.location.href = 'login.html';
+            }
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Farmer Profile - PrakritiKriti</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #4caf50;
+            --primary-light: #80e27e;
+            --primary-dark: #087f23;
+            --white: #ffffff;
+            --text-color: #333333;
+            --card-bg: #ffffff;
+            --card-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            --border-radius: 8px;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        .profile-section {
+            padding: 20px;
+            margin: 10px;
+            border-radius: var(--border-radius);
+            background: var(--white);
+            box-shadow: var(--card-shadow);
+        }
+
+        .section-title {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .info-item {
+            padding: 10px;
+            background: #f5f5f5;
+            border-radius: 4px;
+        }
+
+        .tag-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .tag {
+            background: var(--primary-color);
+            color: var(--white);
+            padding: 5px 15px;
+            border-radius: 15px;
+            font-size: 0.9rem;
+        }
+
+        .site-header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+        }
+
+        .site-header img {
+            width: 100px;
+            height: auto;
+            margin-bottom: 10px;
+        }
+
+        .site-header h1 {
+            color: var(--primary-color);
+            margin: 0;
+            font-size: 2rem;
+        }
+
+        .farmer-name {
+            text-align: center;
+            font-size: 1.8rem;
+            color: var(--primary-dark);
+            margin: 20px 0;
+            padding: 15px;
+            background: var(--white);
+            border-radius: var(--border-radius);
+            box-shadow: var(--card-shadow);
+        }
+
+        .back-button {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: var(--primary-color);
+            color: var(--white);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: 'Poppins', sans-serif;
+            transition: background-color 0.3s;
+        }
+
+        .back-button:hover {
+            background: var(--primary-dark);
+        }
+    </style>
+</head>
+
+<body>
+    <button class="back-button" onclick="goToDashboard()">
+        <i class="fas fa-arrow-left"></i> Back to Dashboard
+    </button>
+
+    <div class="site-header">
+        <img src="logo.jpg" alt="PrakritiKriti Logo">
+        <h1>PrakritiKriti</h1>
+    </div>
+
+    <div id="farmer-name" class="farmer-name">
+        <!-- Farmer's name will be inserted here -->
+    </div>
+
+    <div id="profile-container">
+        <!-- Content will be dynamically populated -->
+    </div>
+
+    <!-- Firebase Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
+    <script>
+        // Initialize Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyCgvhMdnHX9yVvMBJdh3uaBYbUIdPtD9_k",
+            authDomain: "prakritikriti-d5603.firebaseapp.com",
+            databaseURL: "https://prakritikriti-d5603-default-rtdb.firebaseio.com",
+            projectId: "prakritikriti-d5603",
+            storageBucket: "prakritikriti-d5603.firbasestorage.app",
+            messagingSenderId: "1050876813362",
+            appId: "1:1050876813362:web:38ffd26d667ff4a8dddc2b"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        document.addEventListener('DOMContentLoaded', function () {
+            // Get farmer ID from URL parameters or session storage
+            const urlParams = new URLSearchParams(window.location.search);
+            const farmerId = urlParams.get('farmerID') || JSON.parse(sessionStorage.getItem('userInfo')).ID;
+
+            if (!farmerId) {
+                console.error('No farmer ID provided');
+                return;
+            }
+
+            // Load and display farmer data
+            loadFarmerProfile(farmerId);
+        });
+
+        function goToDashboard() {
+            window.location.href = 'demodash.html';
+        }
+
+        function loadFarmerProfile(farmerId) {
+            const profileContainer = document.getElementById('profile-container');
+            const farmerNameElement = document.getElementById('farmer-name');
+
+            // Load basic info
+            database.ref(`farmers/${farmerId}/basic_info`).once('value')
+                .then((snapshot) => {
+                    const basicInfo = snapshot.val();
+                    if (basicInfo) {
+                        farmerNameElement.textContent = basicInfo.fullName || 'Farmer Name Not Provided';
+                        const basicInfoHTML = `
+                            <div class="profile-section">
+                                <h2 class="section-title">Basic Information</h2>
+                                <div class="info-grid">
+                                    <div class="info-item">
+                                        <strong>Farmer ID:</strong> ${farmerId}
+                                    </div>
+                                    <div class="info-item">
+                                        <strong>Name:</strong> ${basicInfo.fullName || 'Not provided'}
+                                    </div>
+                                    <div class="info-item">
+                                        <strong>Email:</strong> ${basicInfo.email || 'Not provided'}
+                                    </div>
+                                    <div class="info-item">
+                                        <strong>Mobile:</strong> ${basicInfo.mobile || 'Not provided'}
+                                    </div>
+                                    <div class="info-item">
+                                        <strong>Village:</strong> ${basicInfo.village || 'Not provided'}
+                                    </div>
+                                    <div class="info-item">
+                                        <strong>District:</strong> ${basicInfo.district || 'Not provided'}
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        profileContainer.innerHTML = basicInfoHTML;
+                    }
+                });
+
+            // Load farm details
+            database.ref(`farmers/${farmerId}/farmdetails`).once('value')
+                .then((snapshot) => {
+                    const farmDetails = snapshot.val();
+                    if (farmDetails) {
+                        const farmDetailsHTML = `
+                            <div class="profile-section">
+                                <h2 class="section-title">Farm Details</h2>
+                                <div class="info-grid">
+                                    <div class="info-item">
+                                        <strong>Farm Type:</strong> ${farmDetails.farmType || 'Not provided'}
+                                    </div>
+                                    <div class="info-item">
+                                        <strong>Land Size:</strong> ${farmDetails.landSize || '0'} ${farmDetails.landUnit || 'acres'}
+                                    </div>
+                                </div>
+                                <div class="profile-section">
+                                    <h3>Crops</h3>
+                                    <div class="tag-container">
+                                        ${farmDetails.crops ? farmDetails.crops.map(crop =>
+                            `<span class="tag">${crop}</span>`
+                        ).join('') : 'No crops added'}
+                                    </div>
+                                </div>
+                                <div class="profile-section">
+                                    <h3>Harvest Seasons</h3>
+                                    <div class="tag-container">
+                                        ${farmDetails.harvestSeasons ? farmDetails.harvestSeasons.map(season =>
+                            `<span class="tag">${season}</span>`
+                        ).join('') : 'No seasons added'}
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        profileContainer.innerHTML += farmDetailsHTML;
+                    }
+                })
+                .catch(error => {
+                    console.error("Error loading farm details:", error);
+                });
+        }
+    </script>
+</body>
+
+</html>

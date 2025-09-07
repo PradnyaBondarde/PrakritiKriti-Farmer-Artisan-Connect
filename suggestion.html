@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Waste Analysis & Upload - PrakritiKriti</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700&display=swap" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@2.0.0/dist/tf.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+
+    <style>
+        :root {
+            --primary-color: #2d6a4f;
+            --primary-light: #61a480;
+            --primary-dark: #1b3a29;
+            --secondary-color: #4a7c59;
+            --text-light: #f8f9fa;
+            --text-dark: #2d3436;
+            --bg-light: #f8f9fa;
+            --border-radius: 12px;
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.1);
+            --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-dark);
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .analysis-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .brand-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 40px;
+            padding: 20px 0;
+            border-bottom: 2px solid var(--primary-light);
+        }
+
+        .brand-logo {
+            width: 60px;
+            height: 60px;
+            background: var(--primary-color);
+            border-radius: var(--border-radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .brand-name {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--primary-dark);
+        }
+
+        .upload-section {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 40px;
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 30px;
+        }
+
+        .upload-zone {
+            border: 2px dashed var(--primary-color);
+            border-radius: var(--border-radius);
+            padding: 40px;
+            text-align: center;
+            background: rgba(45, 106, 79, 0.05);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .upload-zone:hover {
+            background: rgba(45, 106, 79, 0.1);
+            transform: translateY(-2px);
+        }
+
+        #imagePreview {
+            max-width: 400px;
+            width: 100%;
+            border-radius: var(--border-radius);
+            margin: 20px auto;
+            display: none;
+            box-shadow: var(--shadow-md);
+        }
+
+        .analysis-results {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 30px;
+            margin-top: 30px;
+            box-shadow: var(--shadow-sm);
+            display: none;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--primary-dark);
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            max-width: 400px;
+            transition: var(--transition);
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(45, 106, 79, 0.1);
+        }
+
+        button {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        button:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .recommendations-section {
+            margin-top: 40px;
+            display: none;
+        }
+
+        .artisans-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .artisan-card {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .artisan-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .artisan-card::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--primary-color);
+            opacity: 0;
+            transition: var(--transition);
+        }
+
+        .artisan-card:hover::after {
+            opacity: 1;
+        }
+
+        .view-profile-btn {
+            width: 100%;
+            margin-top: 15px;
+            background: var(--primary-light);
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 30px;
+        }
+
+        .loading i {
+            font-size: 32px;
+            color: var(--primary-color);
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 600;
+            margin-bottom: 20px;
+            transition: var(--transition);
+        }
+
+        .back-btn:hover {
+            color: var(--primary-dark);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="analysis-container">
+        <div class="brand-header">
+            <div class="brand-logo"><i class="fas fa-leaf"></i></div>
+            <div class="brand-name">PrakritiKriti</div>
+        </div>
+
+        <a href="demodash.html" class="back-btn">
+            <i class="fas fa-arrow-left"></i> Back to Dashboard
+        </a>
+
+        <div class="upload-section">
+            <h1>Agricultural Waste Analysis</h1>
+            <p>Upload an image to analyze and list your agricultural waste</p>
+
+            <div class="upload-zone" onclick="document.getElementById('fileInput').click()">
+                <input type="file" id="fileInput" accept="image/*" style="display: none" />
+                <i class="fas fa-cloud-upload-alt" style="font-size: 3rem; color: var(--primary-color)"></i>
+                <h3>Click to upload waste image</h3>
+                <p>Supported formats: JPG, PNG</p>
+            </div>
+
+            <div class="preview-container">
+                <img id="imagePreview" />
+            </div>
+        </div>
+
+        <div class="analysis-results" id="resultsSection">
+            <h2>Analysis Results</h2>
+            <div id="predictionResults">
+                <div class="confidence-meter">
+                    <div id="confidenceBar"></div>
+                </div>
+                <p id="confidenceText"></p>
+            </div>
+
+            <form id="wasteDetailsForm">
+                <div class="form-group">
+                    <label for="quantity">Quantity (in kilograms)</label>
+                    <input type="number" id="quantity" min="1" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="pricePerKg">Price per KG (₹)</label>
+                    <input type="number" id="pricePerKg" min="1" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="correctionSelect">Confirm Waste Type</label>
+                    <select id="correctionSelect" required>
+                        <option value="">-- Select Waste Type --</option>
+                        <option value="Banana_Leaf_Waste">Banana Leaf Waste</option>
+                        <option value="Arecanut_Leaf">Arecanut Leaf</option>
+                        <option value="Cotton_Stalk">Cotton Stalk</option>
+                        <option value="Maize_Cob">Maize Cob</option>
+                        <option value="Paddy_Straw">Paddy Straw</option>
+                    </select>
+                </div>
+
+                <button type="button" onclick="submitWasteData()">
+                    <i class="fas fa-upload"></i> Upload Waste Details
+                </button>
+            </form>
+        </div>
+
+        <div class="loading">
+            <i class="fas fa-spinner"></i>
+            <p>Analyzing your waste image...</p>
+        </div>
+
+        <div class="recommendations-section" id="recommendationsSection">
+            <h2>Recommended Artisans</h2>
+            <div class="artisans-grid" id="recommendedArtisans"></div>
+        </div>
+    </div>
+
+    <script>
+        // State Management
+        let farmerId = null;
+        let model = null;
+        let lastPrediction = "";
+        let lastConfidence = 0;
+
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyCgvhMdnHX9yVvMBJdh3uaBYbUIdPtD9_k",
+            authDomain: "prakritikriti-d5603.firebaseapp.com",
+            databaseURL: "https://prakritikriti-d5603-default-rtdb.firebaseio.com",
+            projectId: "prakritikriti-d5603",
+            storageBucket: "prakritikriti-d5603.appspot.com",
+            messagingSenderId: "1050876813362",
+            appId: "1:1050876813362:web:38ffd26d667ff4a8dddc2b"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        // Session Management
+        function saveState() {
+            const state = {
+                wasteType: document.getElementById('correctionSelect').value,
+                quantity: document.getElementById('quantity').value,
+                pricePerKg: document.getElementById('pricePerKg').value,
+                recommendations: document.getElementById('recommendedArtisans').innerHTML
+            };
+            sessionStorage.setItem('suggestionState', JSON.stringify(state));
+        }
+
+        function restoreState() {
+            const savedState = sessionStorage.getItem('suggestionState');
+            if (savedState) {
+                const state = JSON.parse(savedState);
+                document.getElementById('correctionSelect').value = state.wasteType;
+                document.getElementById('quantity').value = state.quantity;
+                document.getElementById('pricePerKg').value = state.pricePerKg;
+                document.getElementById('recommendedArtisans').innerHTML = state.recommendations;
+                document.getElementById('recommendationsSection').style.display = 'block';
+                sessionStorage.removeItem('suggestionState');
+            }
+        }
+
+        // ML Model Handling
+        async function loadModel() {
+            try {
+                model = await tf.loadLayersModel('model/model.json');
+                await model.predict(tf.zeros([1, 224, 224, 3])).data();
+            } catch (error) {
+                console.error('Model loading error:', error);
+                alert('Error loading ML model. Please try again later.');
+            }
+        }
+
+        // Image Classification
+        async function classifyImage(img) {
+            document.querySelector('.loading').style.display = 'block';
+            const tensor = tf.tidy(() => {
+                return tf.browser.fromPixels(img)
+                    .resizeNearestNeighbor([224, 224])
+                    .toFloat()
+                    .div(255.0)
+                    .expandDims();
+            });
+
+            try {
+                const predictions = await model.predict(tensor).softmax().data();
+                const maxIndex = predictions.indexOf(Math.max(...predictions));
+                lastPrediction = ['Banana_Leaf_Waste', 'Arecanut_Leaf', 'Cotton_Stalk', 'Maize_Cob', 'Paddy_Straw'][maxIndex];
+                lastConfidence = predictions[maxIndex];
+
+                document.getElementById('resultsSection').style.display = 'block';
+                document.getElementById('correctionSelect').value = lastPrediction;
+                document.getElementById('confidenceBar').style.width = `${lastConfidence * 100}%`;
+                document.getElementById('confidenceText').textContent = 
+                    `Detected: ${lastPrediction.replace(/_/g, ' ')} (${(lastConfidence * 100).toFixed(1)}% confidence)`;
+            } catch (error) {
+                console.error('Classification error:', error);
+                alert('Error analyzing image. Please try again.');
+            } finally {
+                tensor.dispose();
+                document.querySelector('.loading').style.display = 'none';
+            }
+        }
+
+        // File Upload Handling
+        document.getElementById('fileInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = document.getElementById('imagePreview');
+                img.src = e.target.result;
+                img.style.display = 'block';
+                img.onload = () => classifyImage(img);
+            };
+            reader.readAsDataURL(file);
+        });
+
+        // Data Submission
+        async function submitWasteData() {
+            const wasteType = document.getElementById('correctionSelect').value;
+            const quantity = document.getElementById('quantity').value;
+            const pricePerKg = document.getElementById('pricePerKg').value;
+
+            if (!wasteType || !quantity || !pricePerKg) {
+                alert('Please fill all required fields');
+                return;
+            }
+
+            try {
+                const timestamp = new Date().toISOString();
+                const countRef = db.ref(`farmers/${farmerId}/wasteCounts/${wasteType}`);
+                const countSnap = await countRef.once('value');
+                const currentCount = countSnap.exists() ? countSnap.val() : 0;
+                const serialNumber = currentCount + 1;
+                const uploadKey = `${wasteType}_${String(serialNumber).padStart(3, '0')}`;
+
+                const uploadData = {
+                    wasteType: wasteType,
+                    quantity: parseInt(quantity),
+                    pricePerKg: parseInt(pricePerKg),
+                    mlPrediction: lastPrediction,
+                    confidence: lastConfidence,
+                    timestamp: timestamp,
+                    status: "available",
+                    farmerId: farmerId
+                };
+
+                await db.ref(`uploads/${farmerId}/${uploadKey}`).set(uploadData);
+                await countRef.set(serialNumber);
+
+                alert('Waste details uploaded successfully!');
+                loadRecommendations(wasteType);
+                document.getElementById('recommendationsSection').style.display = 'block';
+            } catch (error) {
+                console.error('Upload error:', error);
+                alert('Error submitting waste details. Please try again.');
+            }
+        }
+
+        // Artisan Recommendations
+        async function loadRecommendations(wasteType) {
+            const wasteMapping = {
+                'Banana_Leaf_Waste': 'banana-leaf',
+                'Arecanut_Leaf': 'arecanut',
+                'Cotton_Stalk': 'cotton-stalk',
+                'Maize_Cob': 'maize-cob',
+                'Paddy_Straw': 'paddy-straw'
+            };
+
+            const targetType = wasteMapping[wasteType];
+            const container = document.getElementById('recommendedArtisans');
+            container.innerHTML = '<p>Loading recommendations...</p>';
+
+            try {
+                const snapshot = await db.ref('artisans').once('value');
+                const artisans = snapshot.val();
+                container.innerHTML = '';
+
+                Object.entries(artisans).forEach(([id, data]) => {
+                    if (data.marketDetails?.wasteType?.toLowerCase() === targetType) {
+                        const card = document.createElement('div');
+                        card.className = 'artisan-card';
+                        card.innerHTML = `
+                            <h3>${data.basic?.fullName || 'Artisan'}</h3>
+                            <p><i class="fas fa-industry"></i> ${data.marketDetails?.industryName || 'No industry specified'}</p>
+                            <p><i class="fas fa-map-marker-alt"></i> ${data.basic?.village || ''}, ${data.basic?.district || ''}</p>
+                            <p><i class="fas fa-rupee-sign"></i> ₹${data.marketDetails?.pricePerUnit || 'N/A'} per unit</p>
+                            <button class="view-profile-btn" onclick="viewArtisanProfile('${id}')">
+                                <i class="fas fa-eye"></i> View Profile
+                            </button>
+                        `;
+                        container.appendChild(card);
+                    }
+                });
+
+                if (!container.innerHTML) {
+                    container.innerHTML = '<p>No matching artisans found for this waste type.</p>';
+                }
+            } catch (error) {
+                console.error('Recommendation error:', error);
+                container.innerHTML = '<p>Error loading recommendations.</p>';
+            }
+        }
+
+        // Profile Navigation
+        function viewArtisanProfile(artisanID) {
+            saveState();
+            window.location.href = `viewProfileofArtisan.html?artisanID=${artisanID}`;
+        }
+
+        // Initialization
+        document.addEventListener('DOMContentLoaded', async () => {
+            const userInfo = JSON.parse(sessionStorage.getItem('userInfo'));
+            if (!userInfo || userInfo.role !== 'farmer') {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            farmerId = userInfo.ID;
+            await loadModel();
+            restoreState();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connection Requests - PrakritiKriti</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
+    <style>
+        :root {
+            --primary-color: #4caf50;
+            --primary-dark: #087f23;
+            --background-color: #f8f7f2;
+            --card-background: #ffffff;
+            --text-color: #333333;
+            --border-radius: 12px;
+            --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: var(--background-color);
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: var(--text-color);
+            margin-bottom: 30px;
+        }
+
+        .request-card {
+            background: var(--card-background);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: var(--box-shadow);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .artisan-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .artisan-icon {
+            color: var(--primary-color);
+        }
+
+        .artisan-details h3 {
+            margin: 0 0 5px 0;
+            color: var(--text-color);
+        }
+
+        .artisan-id {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .request-message {
+            margin: 10px 0;
+            color: #555;
+        }
+
+        .request-meta {
+            font-size: 0.8rem;
+            color: #777;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .accept-btn,
+        .reject-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-family: 'Nunito', sans-serif;
+        }
+
+        .accept-btn {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .reject-btn {
+            background: #ff4444;
+            color: white;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 12px 24px;
+            background: var(--primary-color);
+            color: white;
+            border-radius: 4px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            display: none;
+        }
+
+        .no-requests {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .no-requests i {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            opacity: 0.8;
+        }
+
+        .no-requests p {
+            font-size: 1.2rem;
+            margin: 10px 0 5px;
+            color: #444;
+        }
+
+        .no-requests .sub-text {
+            font-size: 0.9rem;
+            color: #888;
+            display: block;
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .back-btn {
+            padding: 8px 16px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: 'Nunito', sans-serif;
+        }
+
+        .back-btn:hover {
+            background: var(--primary-dark);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header-container">
+            <h1>Connection Requests</h1>
+            <button onclick="handleBackToDashboard()" class="back-btn">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </button>
+        </div>
+        <div id="requestsContainer"></div>
+    </div>
+
+    <script>
+        // Declare userInfo globally
+        let userInfo;
+
+        document.addEventListener('DOMContentLoaded', function () {
+            // Ensure userInfo is available
+            if (!userInfo || !userInfo.ID) {
+                const urlParams = new URLSearchParams(window.location.search);
+                const farmerID = urlParams.get('ID');
+                if (farmerID) {
+                    userInfo = { ID: farmerID };
+                } else {
+                    window.location.href = 'login.html';
+                    return;
+                }
+            }
+
+            loadRequests();
+        });
+
+        function loadRequests() {
+            const farmerID = userInfo.ID;
+            const requestsRef = firebase.database().ref(`farmerRequests/${farmerID}/received`);
+
+            requestsRef.on('value', (snapshot) => {
+                const requests = snapshot.val() || {};
+                const container = document.getElementById('requestsContainer');
+                container.innerHTML = '';
+
+                if (Object.keys(requests).length === 0) {
+                    showNoRequestsMessage(container);
+                    return;
+                }
+
+                Object.entries(requests).forEach(([artisanID, request]) => {
+                    const card = createRequestCard(artisanID, request);
+                    container.appendChild(card);
+                });
+            });
+        }
+
+        function showNoRequestsMessage(container) {
+            container.innerHTML = `
+                <div class="no-requests">
+                    <i class="fas fa-check-circle fa-3x"></i>
+                    <p>No pending connection requests</p>
+                    <span class="sub-text">All requests have been handled</span>
+                </div>
+            `;
+        }
+
+        async function handleAccept(artisanID) {
+            const farmerID = userInfo.ID;
+
+            try {
+                // Add connections for both farmer and artisan
+                await firebase.database().ref(`connections/${farmerID}/connections/${artisanID}`).set(true);
+                await firebase.database().ref(`connections/${artisanID}/connections/${farmerID}`).set(true);
+
+                // Update both request nodes
+                await firebase.database().ref(`farmerRequests/${farmerID}/received/${artisanID}`).update({
+                    status: 'accepted'
+                });
+                await firebase.database().ref(`artisanRequests/${artisanID}/received/${farmerID}`).update({
+                    status: 'accepted'
+                });
+
+                // Remove card from UI
+                const card = document.querySelector(`[data-artisan-id="${artisanID}"]`);
+                if (card) {
+                    card.remove();
+                }
+
+                showToast('Connection request accepted successfully');
+
+                // Check if no more requests and show appropriate message
+                const container = document.getElementById('requestsContainer');
+                if (!container.children.length) {
+                    showNoRequestsMessage(container);
+                }
+            } catch (error) {
+                console.error('Error accepting request:', error);
+                showToast('Error accepting request. Please try again.');
+            }
+        }
+
+        async function handleReject(artisanID) {
+            const farmerID = userInfo.ID;
+            try {
+                await firebase.database().ref(`artisanRequests/${farmerID}/received/${artisanID}`).update({
+                    status: 'rejected'
+                });
+                showToast('Connection request rejected');
+            } catch (error) {
+                console.error('Error rejecting request:', error);
+                showToast('Error rejecting request');
+            }
+        }
+
+        function createRequestCard(artisanID, request) {
+            const card = document.createElement('div');
+            card.className = 'request-card';
+            card.setAttribute('data-artisan-id', artisanID);
+
+            card.innerHTML = `
+                <div class="artisan-info">
+                    <div class="artisan-icon">
+                        <i class="fas fa-user-circle fa-2x"></i>
+                    </div>
+                    <div class="artisan-details">
+                        <h3>${request.artisanName || 'Unknown Artisan'}</h3>
+                        <span class="artisan-id">ID: ${artisanID}</span>
+                        <div class="request-message">
+                            <i class="fas fa-comment-alt"></i>
+                            <span>${request.message}</span>
+                        </div>
+                        <div class="request-meta">
+                            <span><i class="fas fa-leaf"></i> ${request.wasteType.replace(/_/g, ' ')}</span>
+                            <span><i class="fas fa-clock"></i> ${new Date(request.timestamp).toLocaleDateString()}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="action-buttons">
+                    <button onclick="handleAccept('${artisanID}')" class="accept-btn">
+                        <i class="fas fa-check"></i> Accept
+                    </button>
+                    <button onclick="handleReject('${artisanID}')" class="reject-btn">
+                        <i class="fas fa-times"></i> Reject
+                    </button>
+                </div>
+            `;
+            return card;
+        }
+
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+
+            // Show toast
+            setTimeout(() => toast.style.display = 'block', 100);
+
+            // Remove toast after 3 seconds
+            setTimeout(() => {
+                toast.style.display = 'none';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        function handleBackToDashboard() {
+            const userInfo = JSON.parse(sessionStorage.getItem('userInfo'));
+            if (userInfo && userInfo.ID) {
+                window.location.href = `demodash.html?ID=${userInfo.ID}`;
+            } else {
+                const urlParams = new URLSearchParams(window.location.search);
+                const farmerID = urlParams.get('ID');
+                if (farmerID) {
+                    window.location.href = `demodash.html?ID=${farmerID}`;
+                } else {
+                    window.location.href = 'login.html';
+                }
+            }
+        }
+    </script>
+</body>
+
+</html>

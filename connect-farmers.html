@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Connect with Farmers - PrakritiKriti</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+
+  <style>
+    :root {
+      --primary-color: #4caf50;
+      --primary-light: #80e27e;
+      --primary-dark: #087f23;
+      --white: #ffffff;
+      --text-color: #333;
+      --gray: #ccc;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      background: #f9fbf7;
+      color: var(--text-color);
+    }
+
+    .container {
+      display: flex;
+    }
+
+    .sidebar {
+      width: 250px;
+      background: var(--white);
+      padding: 20px;
+      box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05);
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      margin-bottom: 30px;
+    }
+
+    .logo img {
+      width: 40px;
+      margin-right: 10px;
+    }
+
+    .logo h2 {
+      font-size: 1.3rem;
+      color: var(--primary-dark);
+    }
+
+    .sidebar ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .sidebar li {
+      padding: 12px 10px;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .sidebar li:hover,
+    .sidebar li.active {
+      background: var(--primary-light);
+      color: white;
+    }
+
+    .main {
+      flex: 1;
+      padding: 30px;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 25px;
+    }
+
+    .header h1 {
+      font-size: 24px;
+      color: var(--primary-dark);
+    }
+
+    .filters {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .filters input,
+    .filters select {
+      padding: 10px 14px;
+      border: 1px solid var(--gray);
+      border-radius: 8px;
+      font-size: 14px;
+    }
+
+    .farmer-card {
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      padding: 20px;
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      flex-wrap: wrap;
+    }
+
+    .farmer-details {
+      max-width: 80%;
+    }
+
+    .farmer-details h3 {
+      margin: 0 0 10px;
+      color: var(--primary-color);
+    }
+
+    .farmer-details p {
+      margin: 4px 0;
+      font-size: 14px;
+    }
+
+    .action-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .btn {
+      padding: 8px 14px;
+      background: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .btn.remove {
+      background: #d9534f;
+    }
+
+    .btn.view {
+      background: #2196f3;
+    }
+
+    .btn:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+
+    @media (max-width: 768px) {
+      .farmer-details {
+        max-width: 100%;
+      }
+      .farmer-card {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <aside class="sidebar">
+      <div class="logo">
+        <img src="logo.jpg" alt="Logo" />
+        <h2>PrakritiKriti</h2>
+      </div>
+      <ul>
+        <li><a href="artisandashboard.html"><i class="fas fa-home"></i> Dashboard</a></li>
+        <li class="active"><i class="fas fa-handshake"></i> Connect Farmers</li>
+      </ul>
+    </aside>
+
+    <main class="main">
+      <div class="header">
+        <h1>Connect with Farmers</h1>
+      </div>
+
+      <div class="filters">
+        <input type="text" id="searchInput" placeholder="Search by name, district, crop..." />
+        <select id="filterCrop">
+          <option value="">All Crops</option>
+          <option value="Maize">Maize</option>
+          <option value="Wheat">Wheat</option>
+          <option value="Rice">Rice</option>
+          <option value="Cotton">Cotton</option>
+        </select>
+        <select id="filterConnection">
+          <option value="">All Farmers</option>
+          <option value="connected">Connected</option>
+          <option value="unconnected">Unconnected</option>
+        </select>
+      </div>
+
+      <div id="farmerList"></div>
+    </main>
+  </div>
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyCgvhMdnHX9yVvMBJdh3uaBYbUIdPtD9_k",
+      authDomain: "prakritikriti-d5603.firebaseapp.com",
+      databaseURL: "https://prakritikriti-d5603-default-rtdb.firebaseio.com",
+      projectId: "prakritikriti-d5603",
+      storageBucket: "prakritikriti-d5603.appspot.com",
+      messagingSenderId: "1050876813362",
+      appId: "1:1050876813362:web:38ffd26d667ff4a8dddc2b"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    const userInfo = JSON.parse(sessionStorage.getItem('userInfo'));
+    if (!userInfo || userInfo.role !== 'artisan') {
+      alert('Please sign in as an artisan to access this page.');
+      window.location.href = 'login.html';
+    }
+
+    const artisanID = userInfo.ID;
+    const farmerList = document.getElementById('farmerList');
+    const searchInput = document.getElementById('searchInput');
+    const filterCrop = document.getElementById('filterCrop');
+    const filterConnection = document.getElementById('filterConnection');
+
+    let farmers = [];
+    let connected = [];
+
+    function loadConnections() {
+      db.ref(`connectionsToFarmers/${artisanID}`).once('value', snap => {
+        connected = snap.val() ? Object.keys(snap.val()) : [];
+        renderFarmers();
+      });
+    }
+
+    function loadFarmers() {
+      db.ref('farmers').once('value', snapshot => {
+        farmers = [];
+        snapshot.forEach(child => {
+          farmers.push({ id: child.key, ...child.val() });
+        });
+        loadConnections();
+      });
+    }
+
+    function renderFarmers() {
+      farmerList.innerHTML = '';
+      const search = searchInput.value.toLowerCase();
+      const cropFilter = filterCrop.value;
+      const connFilter = filterConnection.value;
+
+      const filtered = farmers.filter(f => {
+        const name = f.basic_info?.fullName?.toLowerCase() || '';
+        const district = f.basic_info?.district?.toLowerCase() || '';
+        const crops = f.farmdetails?.crops || [];
+        const isConnected = connected.includes(f.id);
+
+        const matchSearch = name.includes(search) || district.includes(search) || crops.join(',').toLowerCase().includes(search);
+        const matchCrop = !cropFilter || crops.includes(cropFilter);
+        const matchConnection = connFilter === '' ||
+          (connFilter === 'connected' && isConnected) ||
+          (connFilter === 'unconnected' && !isConnected);
+
+        return matchSearch && matchCrop && matchConnection;
+      });
+
+      filtered.forEach(farmer => {
+        const isConnected = connected.includes(farmer.id);
+        const card = document.createElement('div');
+        card.className = 'farmer-card';
+
+        const html = `
+          <div class="farmer-details">
+            <h3>${farmer.basic_info.fullName}</h3>
+            <p><strong>ID:</strong> ${farmer.id}</p>
+            <p><strong>Mobile:</strong> ${farmer.basic_info.mobile}</p>
+            <p><strong>Address:</strong> ${farmer.basic_info.village}, ${farmer.basic_info.taluk}, ${farmer.basic_info.district}, ${farmer.basic_info.state}</p>
+            <p><strong>Farm Type:</strong> ${farmer.farmdetails.farmType}</p>
+            <p><strong>Land:</strong> ${farmer.farmdetails.landSize} ${farmer.farmdetails.landUnit}</p>
+            <p><strong>Crops:</strong> ${farmer.farmdetails.crops.join(', ')}</p>
+            <p><strong>Seasons:</strong> ${farmer.farmdetails.harvestSeasons.join(', ')}</p>
+          </div>
+          <div class="action-buttons">
+            <button class="btn ${isConnected ? 'remove' : ''}" onclick="${isConnected ? `removeConnection('${farmer.id}', this)` : `connect('${farmer.id}', this)`}">
+              ${isConnected ? 'Remove' : 'Connect'}
+            </button>
+            <button class="btn view" onclick="viewProfile('${farmer.id}')">View Profile</button>
+          </div>
+        `;
+
+        card.innerHTML = html;
+        farmerList.appendChild(card);
+      });
+    }
+
+    function connect(farmerID, btn) {
+      db.ref(`connectionsToFarmers/${artisanID}/${farmerID}`).set(true).then(() => {
+        btn.textContent = 'Remove';
+        btn.classList.add('remove');
+        btn.setAttribute('onclick', `removeConnection('${farmerID}', this)`);
+        connected.push(farmerID);
+        renderFarmers();
+      });
+    }
+
+    function removeConnection(farmerID, btn) {
+      db.ref(`connectionsToFarmers/${artisanID}/${farmerID}`).remove().then(() => {
+        btn.textContent = 'Connect';
+        btn.classList.remove('remove');
+        btn.setAttribute('onclick', `connect('${farmerID}', this)`);
+        connected = connected.filter(id => id !== farmerID);
+        renderFarmers();
+      });
+    }
+
+    function viewProfile(farmerID) {
+      window.open(`farmerprofileinartisian.html?farmerID=${farmerID}`, '_blank');
+    }
+
+    searchInput.addEventListener('input', renderFarmers);
+    filterCrop.addEventListener('change', renderFarmers);
+    filterConnection.addEventListener('change', renderFarmers);
+
+    window.onload = loadFarmers;
+  </script>
+</body>
+</html>

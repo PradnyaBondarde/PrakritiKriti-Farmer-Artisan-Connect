@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up</title>
+    <style>
+        :root {
+            --primary-color: #4caf50;
+            --primary-light: #80e27e;
+            --primary-dark: #087f23;
+            --white: #ffffff;
+            --error: #ff3333;
+            --text-color: #333333;
+            --text-dark: #222222;
+        }
+
+        body {
+            background: url('home.jpg') no-repeat center center fixed;
+            background-size: cover;
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.8);
+            z-index: -1;
+        }
+
+        .container {
+            width: 80%;
+            max-width: 1000px;
+            display: flex;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            height: 600px;
+        }
+
+        .image-section {
+            flex: 1;
+            background: var(--primary-color);
+            padding: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            color: var(--white);
+        }
+
+        .image-content {
+            text-align: center;
+            z-index: 1;
+        }
+
+        .image-content h2 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            color: var(--white);
+        }
+
+        .image-content p {
+            font-size: 1rem;
+            line-height: 1.6;
+            color: var(--white);
+            opacity: 0.9;
+        }
+
+        .form-container {
+            flex: 1;
+            padding: 40px;
+            background: var(--white);
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            color: var(--primary-dark);
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-color);
+            font-size: 0.9rem;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        input:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px var(--primary-light);
+        }
+
+        select {
+            background-color: var(--white);
+            cursor: pointer;
+        }
+
+        select:invalid {
+            color: #757575;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .login-link {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.9rem;
+        }
+
+        .login-link a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .error {
+            color: var(--error);
+            font-size: 0.8rem;
+            margin-top: 5px;
+            display: block;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                width: 95%;
+                flex-direction: column;
+                height: auto;
+            }
+
+            .image-section {
+                padding: 30px;
+            }
+
+            .image-content h2 {
+                font-size: 1.5rem;
+            }
+
+            .form-container {
+                padding: 30px;
+            }
+        }
+    </style>
+
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+</head>
+
+<body>
+    <div class="container">
+        <div class="image-section">
+            <div class="image-content">
+                <h2>Welcome to PrakritiKriti</h2>
+                <p>Join our community and be part of the sustainable crafting revolution. Transform agricultural waste
+                    into beautiful handicrafts.</p>
+            </div>
+        </div>
+        <div class="form-container">
+            <h1>Create Account</h1>
+            <form id="signupForm">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" required>
+                    <span class="error" id="usernameError"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" required>
+                    <span class="error" id="emailError"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="role">Role</label>
+                    <select id="role" name="role" required>
+                        <option value="">Select your role</option>
+                        <option value="farmer">Farmer</option>
+                        <option value="artisan">Artisan</option>
+                    </select>
+                    <span class="error" id="roleError"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" required>
+                    <span class="error" id="passwordError"></span>
+                </div>
+
+                <button type="submit" class="btn">Sign Up</button>
+            </form>
+
+            <div class="login-link">
+                Already have an account? <a href="login.html">Login</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Initialize Firebase configuration
+            const firebaseConfig = {
+                apiKey: "AIzaSyCgvhMdnHX9yVvMBJdh3uaBYbUIdPtD9_k",
+                authDomain: "prakritikriti-d5603.firebaseapp.com",
+                databaseURL: "https://prakritikriti-d5603-default-rtdb.firebaseio.com",
+                projectId: "prakritikriti-d5603",
+                storageBucket: "prakritikriti-d5603.firebasestorage.app",
+                messagingSenderId: "1050876813362",
+                appId: "1:1050876813362:web:38ffd26d667ff4a8dddc2b"
+            };
+
+            firebase.initializeApp(firebaseConfig);
+            const auth = firebase.auth();
+            const database = firebase.database();
+
+            // Function to get next ID based on role
+            async function getNextId(role) {
+                const prefix = role === 'farmer' ? 'F' : 'A';
+                try {
+                    const snapshot = await database.ref('users').once('value');
+                    const users = snapshot.val() || {};
+
+                    // Filter IDs by role prefix and get the highest number
+                    const existingIds = Object.values(users)
+                        .filter(user => user.ID && user.ID.startsWith(prefix))
+                        .map(user => parseInt(user.ID.slice(1)));
+
+                    const nextNum = existingIds.length > 0 ? Math.max(...existingIds) + 1 : 1;
+                    return `${prefix}${String(nextNum).padStart(3, '0')}`;
+                } catch (error) {
+                    console.error('Error getting next ID:', error);
+                    return `${prefix}001`;
+                }
+            }
+
+            // Function to get next user number
+            async function getNextUserNumber() {
+                try {
+                    const snapshot = await database.ref('users').once('value');
+                    const users = snapshot.val() || {};
+                    const userNumbers = Object.keys(users)
+                        .map(key => parseInt(key.replace('user', '')))
+                        .filter(num => !isNaN(num));
+
+                    return userNumbers.length > 0 ? Math.max(...userNumbers) + 1 : 1;
+                } catch (error) {
+                    console.error('Error getting next user number:', error);
+                    return 1;
+                }
+            }
+
+            const signupForm = document.getElementById('signupForm');
+            signupForm.addEventListener('submit', async function (e) {
+                e.preventDefault();
+
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+                const username = document.getElementById('username').value;
+                const role = document.getElementById('role').value;
+
+                try {
+                    // Create authentication user
+                    const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+
+                    // Get next user number and role-based ID
+                    const userNumber = await getNextUserNumber();
+                    const roleId = await getNextId(role);
+
+                    // Create user data including password
+                    const userData = {
+                        ID: roleId,
+                        username: username,
+                        email: email,
+                        password: password, // Adding password to user data
+                        role: role,
+                        createdAt: firebase.database.ServerValue.TIMESTAMP
+                    };
+
+                    // Store in users/userX node
+                    await database.ref(`users/user${userNumber}`).set(userData);
+
+                    // Show success message
+                    alert(`Registration successful!\nYour ID is: ${roleId}\nPlease login to continue.`);
+
+                    // Sign out the user
+                    await auth.signOut();
+
+                    // Redirect to login page
+                    window.location.href = 'login.html';
+
+                } catch (error) {
+                    console.error('Signup error:', error);
+                    let errorMessage;
+
+                    switch (error.code) {
+                        case 'auth/email-already-in-use':
+                            errorMessage = 'This email is already registered.';
+                            break;
+                        case 'auth/invalid-email':
+                            errorMessage = 'Invalid email address.';
+                            break;
+                        case 'auth/weak-password':
+                            errorMessage = 'Password should be at least 6 characters.';
+                            break;
+                        default:
+                            errorMessage = 'Error creating account. Please try again.';
+                    }
+
+                    const errorElement = document.getElementById(`${error.code.split('/')[1]}Error`) ||
+                        document.getElementById('passwordError');
+                    if (errorElement) {
+                        errorElement.textContent = errorMessage;
+                    } else {
+                        alert(errorMessage);
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,1415 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgriWaste to HandiCrafts | Transform Agricultural Waste into Handcrafted Wonders</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+        /* Base Styles */
+        :root {
+            --primary-color: #4caf50;
+            --primary-light: #80e27e;
+            --primary-dark: #087f23;
+            --secondary-color: #8d6e63;
+            --secondary-light: #be9c91;
+            --secondary-dark: #5f4339;
+            --accent-color: #ffd54f;
+            --text-light: #f5f5f5;
+            --text-dark: #263238;
+            --bg-light: #f9f9f9;
+            --bg-cream: #f8f5e4;
+            --bg-green-transparent: rgba(76, 175, 80, 0.1);
+            --shadow-sm: 0 2px 10px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.15);
+            --border-radius-sm: 4px;
+            --border-radius-md: 8px;
+            --border-radius-lg: 16px;
+            --transition-speed: 0.3s;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            line-height: 1.6;
+            color: var(--text-dark);
+            background-color: var(--bg-light);
+            overflow-x: hidden;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            line-height: 1.3;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 2.5rem;
+            position: relative;
+            color: var(--primary-dark);
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background-color: var(--primary-color);
+            border-radius: 2px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 28px;
+            border-radius: var(--border-radius-md);
+            font-weight: 500;
+            text-decoration: none;
+            transition: all var(--transition-speed);
+            cursor: pointer;
+            border: none;
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: var(--text-light);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            color: var(--primary-dark);
+            border: 2px solid var(--primary-color);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--primary-color);
+            color: var(--text-light);
+            transform: translateY(-2px);
+        }
+
+        /* Navbar */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            background-color: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(8px);
+            box-shadow: var(--shadow-sm);
+            transition: all var(--transition-speed);
+        }
+
+        .navbar.scrolled {
+            background-color: rgba(255, 255, 255, 0.95);
+            box-shadow: var(--shadow-md);
+        }
+
+        .navbar-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo img {
+            height: 40px;
+            width: auto;
+        }
+
+        .logo h1 {
+            font-size: 1.5rem;
+            margin: 0;
+            color: var(--primary-dark);
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        @media screen and (max-width: 768px) {
+            .logo h1 {
+                font-size: 1.2rem;
+            }
+
+            .logo img {
+                height: 32px;
+            }
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+        }
+
+        .nav-link {
+            color: var(--text-dark);
+            text-decoration: none;
+            padding: 0 20px;
+            font-weight: 500;
+            position: relative;
+            transition: all var(--transition-speed);
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 50%;
+            transform: translateX(-50%) scaleX(0);
+            width: 60%;
+            height: 2px;
+            background-color: var(--primary-color);
+            transition: transform var(--transition-speed);
+        }
+
+        .nav-link:hover::after,
+        .nav-link.active::after {
+            transform: translateX(-50%) scaleX(1);
+        }
+
+        .nav-link.active {
+            color: var(--primary-dark);
+        }
+
+        .btn-login {
+            margin-left: 15px;
+            color: var(--primary-dark);
+            font-weight: 600;
+        }
+
+        .btn-signup {
+            margin-left: 15px;
+            background-color: var(--primary-color);
+            color: var(--text-light);
+            padding: 8px 20px;
+            border-radius: var(--border-radius-md);
+        }
+
+        .menu-toggle {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+        }
+
+        .bar {
+            display: block;
+            width: 25px;
+            height: 3px;
+            margin: 3px 0;
+            background-color: var(--text-dark);
+            transition: all var(--transition-speed);
+        }
+
+        /* Hero Section */
+        .hero {
+            position: relative;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-image: url('home.jpg');
+            /* Update with your image path */
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            /* Makes the background static */
+            color: var(--text-light);
+            padding: 0 20px;
+            margin-top: 0;
+        }
+
+        .hero-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.7) 100%);
+            z-index: 1;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            max-width: 900px;
+            padding: 20px;
+        }
+
+        .hero-title {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #ffffff;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .hero-subtitle {
+            font-size: 1.5rem;
+            margin-bottom: 30px;
+            color: #ffffff;
+            font-weight: 500;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+        }
+
+        /* How It Works Section */
+        .how-it-works {
+            padding: 100px 0;
+            background-color: var(--bg-cream);
+        }
+
+        .steps-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 40px;
+        }
+
+        .step {
+            flex: 1;
+            min-width: 280px;
+            max-width: 350px;
+            background-color: #fff;
+            border-radius: var(--border-radius-lg);
+            padding: 30px;
+            text-align: center;
+            box-shadow: var(--shadow-md);
+            transition: transform var(--transition-speed), box-shadow var(--transition-speed);
+        }
+
+        .step:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .step-icon {
+            width: 80px;
+            height: 80px;
+            background-color: var(--bg-green-transparent);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+        }
+
+        .step-icon i {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+        }
+
+        .step h3 {
+            color: var(--primary-dark);
+            margin-bottom: 15px;
+        }
+
+        /* User Roles */
+        .user-roles {
+            padding: 100px 0;
+            background-color: #fff;
+        }
+
+        .roles-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 30px;
+        }
+
+        .role-card {
+            flex: 1;
+            min-width: 280px;
+            max-width: 350px;
+            background-color: var(--bg-light);
+            border-radius: var(--border-radius-lg);
+            padding: 30px;
+            box-shadow: var(--shadow-md);
+            transition: transform var(--transition-speed);
+            border-top: 5px solid var(--primary-color);
+        }
+
+        .role-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .role-icon {
+            width: 70px;
+            height: 70px;
+            background-color: var(--primary-light);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+        }
+
+        .role-icon i {
+            font-size: 2rem;
+            color: var(--text-light);
+        }
+
+        .role-card h3 {
+            color: var(--primary-dark);
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .role-card ul {
+            list-style-position: inside;
+            padding-left: 0;
+        }
+
+        .role-card ul li {
+            margin-bottom: 10px;
+            color: var(--text-dark);
+        }
+
+        /* Impact Section */
+        .impact {
+            padding: 100px 0;
+            background-color: var(--bg-green-transparent);
+        }
+
+        .impact-stats {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 60px;
+        }
+
+        .stat-card {
+            flex: 1;
+            min-width: 200px;
+            max-width: 250px;
+            background-color: #fff;
+            border-radius: var(--border-radius-lg);
+            padding: 30px 20px;
+            text-align: center;
+            box-shadow: var(--shadow-md);
+        }
+
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--primary-dark);
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            color: var(--text-dark);
+            font-weight: 500;
+        }
+
+        .testimonial-slider {
+            position: relative;
+            max-width: 900px;
+            margin: 0 auto;
+            overflow: hidden;
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .testimonials {
+            position: relative;
+            height: 300px;
+        }
+
+        .testimonial {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #fff;
+            display: flex;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            visibility: hidden;
+        }
+
+        .testimonial.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .testimonial-content {
+            flex: 1;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .testimonial-content p {
+            font-size: 1.1rem;
+            font-style: italic;
+            margin-bottom: 20px;
+        }
+
+        .testimonial-author {
+            font-weight: 600;
+            color: var(--primary-dark);
+        }
+
+        .testimonial-image {
+            flex: 1;
+            background-color: #f0f0f0;
+            overflow: hidden;
+        }
+
+        .testimonial-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .testimonial-controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 15px 0;
+            background-color: #fff;
+        }
+
+        .prev-btn,
+        .next-btn {
+            background: transparent;
+            border: none;
+            font-size: 1.2rem;
+            color: var(--primary-dark);
+            cursor: pointer;
+            padding: 5px 10px;
+        }
+
+        .dots {
+            display: flex;
+            gap: 8px;
+            margin: 0 20px;
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: #ddd;
+            cursor: pointer;
+            transition: background-color var(--transition-speed);
+        }
+
+        .dot.active {
+            background-color: var(--primary-color);
+        }
+
+        /* Craft Gallery */
+        .craft-gallery {
+            padding: 100px 0;
+            background-color: #fff;
+        }
+
+        .gallery-wrapper {
+            position: relative;
+            max-width: 1200px;
+            margin: 0 auto 30px;
+            overflow: hidden;
+        }
+
+        .craft-carousel {
+            display: flex;
+            transition: transform 0.5s ease;
+            gap: 30px;
+        }
+
+        .craft-item {
+            min-width: 280px;
+            background-color: var(--bg-light);
+            border-radius: var(--border-radius-lg);
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+            transition: transform var(--transition-speed);
+        }
+
+        .craft-item:hover {
+            transform: translateY(-5px);
+        }
+
+        .craft-image {
+            height: 200px;
+            overflow: hidden;
+        }
+
+        .craft-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform var(--transition-speed);
+        }
+
+        .craft-item:hover .craft-image img {
+            transform: scale(1.05);
+        }
+
+        .craft-item h4 {
+            padding: 15px 20px 5px;
+            color: var(--primary-dark);
+        }
+
+        .craft-item p {
+            padding: 0 20px 20px;
+            color: var(--secondary-dark);
+        }
+
+        .carousel-controls {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            transform: translateY(-50%);
+            display: flex;
+            justify-content: space-between;
+            padding: 0 10px;
+            z-index: 10;
+        }
+
+        .prev-craft,
+        .next-craft {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.8);
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: var(--shadow-sm);
+            transition: all var(--transition-speed);
+        }
+
+        .prev-craft:hover,
+        .next-craft:hover {
+            background-color: #fff;
+            box-shadow: var(--shadow-md);
+        }
+
+        .gallery-cta {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        /* Footer */
+        .footer {
+            background-color: var(--secondary-dark);
+            color: var(--text-light);
+            padding: 80px 0 20px;
+        }
+
+        .footer-content {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 40px;
+            margin-bottom: 50px;
+        }
+
+        .footer-about,
+        .footer-links,
+        .footer-contact,
+        .footer-newsletter {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .footer h3 {
+            margin-bottom: 20px;
+            color: var(--accent-color);
+        }
+
+        .social-icons {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .social-icons a {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: var(--text-light);
+            text-align: center;
+            line-height: 40px;
+            transition: all var(--transition-speed);
+        }
+
+        .social-icons a:hover {
+            background-color: var(--primary-color);
+            transform: translateY(-3px);
+        }
+
+        .footer-links ul {
+            list-style: none;
+        }
+
+        .footer-links ul li {
+            margin-bottom: 10px;
+        }
+
+        .footer-links ul li a {
+            color: var(--text-light);
+            text-decoration: none;
+            transition: color var(--transition-speed);
+        }
+
+        .footer-links ul li a:hover {
+            color: var(--accent-color);
+            padding-left: 5px;
+        }
+
+        .footer-contact p {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        .footer-contact p i {
+            margin-right: 10px;
+            color: var(--accent-color);
+        }
+
+        .newsletter-form {
+            display: flex;
+            margin-top: 20px;
+        }
+
+        .newsletter-form input {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: var(--border-radius-md) 0 0 var(--border-radius-md);
+            font-family: inherit;
+        }
+
+        .btn-subscribe {
+            padding: 12px 20px;
+            background-color: var(--primary-color);
+            color: var(--text-light);
+            border: none;
+            border-radius: 0 var(--border-radius-md) var(--border-radius-md) 0;
+            cursor: pointer;
+            transition: background-color var(--transition-speed);
+        }
+
+        .btn-subscribe:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+
+        .fade-in.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.6);
+            }
+
+            70% {
+                box-shadow: 0 0 0 10px rgba(76, 175, 80, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(76, 175, 80, 0);
+            }
+        }
+
+        /* Responsive Design */
+        @media screen and (max-width: 992px) {
+            .hero-title {
+                font-size: 2.8rem;
+            }
+
+            .hero-subtitle {
+                font-size: 1.2rem;
+            }
+
+            .step,
+            .role-card {
+                min-width: 250px;
+            }
+        }
+
+        @media screen and (max-width: 768px) {
+            .menu-toggle {
+                display: flex;
+            }
+
+            .nav-menu {
+                position: fixed;
+                left: -100%;
+                top: 70px;
+                flex-direction: column;
+                background-color: #fff;
+                width: 100%;
+                text-align: center;
+                transition: 0.3s;
+                box-shadow: 0 10px 27px rgba(0, 0, 0, 0.05);
+                padding: 20px 0;
+            }
+
+            .nav-menu.active {
+                left: 0;
+            }
+
+            .nav-link {
+                margin: 15px 0;
+                padding: 10px 0;
+            }
+
+            .hero-cta {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .hero-cta .btn {
+                margin-top: 10px;
+                width: 100%;
+                max-width: 250px;
+            }
+
+            .hero-title {
+                font-size: 2.5rem;
+            }
+
+            .hero-subtitle {
+                font-size: 1.2rem;
+            }
+
+            .section-title {
+                font-size: 2rem;
+            }
+
+            .testimonial {
+                flex-direction: column;
+                height: auto;
+            }
+
+            .testimonial-content,
+            .testimonial-image {
+                width: 100%;
+            }
+
+            .testimonials {
+                height: 500px;
+            }
+
+            .craft-carousel {
+                overflow-x: auto;
+                padding-bottom: 20px;
+                gap: 15px;
+            }
+
+            .craft-item {
+                min-width: 250px;
+            }
+        }
+
+        @media screen and (max-width: 576px) {
+            .hero-title {
+                font-size: 1.8rem;
+            }
+
+            .hero-subtitle {
+                font-size: 1rem;
+            }
+
+            .stat-card {
+                min-width: 150px;
+            }
+
+            .role-card,
+            .step {
+                min-width: 100%;
+            }
+
+            .testimonials {
+                height: 550px;
+            }
+
+            .craft-item {
+                min-width: 220px;
+            }
+
+            .footer-content>div {
+                min-width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <div class="logo">
+                <img src="logo.jpg" alt="AgriWaste to HandiCrafts Logo">
+                <h1>PrakritiKriti</h1>
+            </div>
+            <div class="menu-toggle" id="mobile-menu">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="#" class="nav-link active">Home</a></li>
+                <li><a href="#" class="nav-link">About</a></li>
+                <li><a href="#how-it-works" class="nav-link">How It Works</a></li>
+                <li><a href="#impact" class="nav-link">Impact</a></li>
+                <li><a href="login.html" class="nav-link btn-login">Login</a></li>
+                <li><a href="signup.html" class="nav-link btn-signup">Sign Up</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <h1 class="hero-title">Transform Agricultural Waste into Handcrafted Wonders</h1>
+            <p class="hero-subtitle">Empowering Farmers. Enabling Artisans. Protecting Nature.</p>
+            <div class="hero-cta">
+                <a href="#" class="btn btn-primary pulse">Get Started</a>
+                <a href="#how-it-works" class="btn btn-secondary">Explore How It Works</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section class="how-it-works" id="how-it-works">
+        <div class="container">
+            <h2 class="section-title">How It Works</h2>
+            <div class="steps-container">
+                <div class="step fade-in" data-delay="100">
+                    <div class="step-icon">
+                        <i class="fas fa-camera"></i>
+                    </div>
+                    <h3>Upload Photo of Agricultural Waste</h3>
+                    <p>Take a picture of your farm waste and upload it to our platform. Our system will analyze and
+                        identify it.</p>
+                </div>
+                <div class="step fade-in" data-delay="300">
+                    <div class="step-icon">
+                        <i class="fas fa-lightbulb"></i>
+                    </div>
+                    <h3>Get Smart Suggestions</h3>
+                    <p>Receive AI-powered recommendations on potential handicrafts that can be created from your waste
+                        materials.</p>
+                </div>
+                <div class="step fade-in" data-delay="500">
+                    <div class="step-icon">
+                        <i class="fas fa-handshake"></i>
+                    </div>
+                    <h3>Connect with Local Artisans/SHGs</h3>
+                    <p>Match with nearby artisans or Self Help Groups who can transform your waste into beautiful
+                        crafts.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- User Role Highlights -->
+    <section class="user-roles">
+        <div class="container">
+            <h2 class="section-title">Who Benefits</h2>
+            <div class="roles-container">
+                <div class="role-card">
+                    <div class="role-icon">
+                        <i class="fas fa-tractor"></i>
+                    </div>
+                    <h3>Farmers</h3>
+                    <ul>
+                        <li>Upload waste inventory</li>
+                        <li>Track waste transformation</li>
+                        <li>Earn eco-rewards</li>
+                        <li>Reduce disposal costs</li>
+                    </ul>
+                </div>
+                <div class="role-card">
+                    <div class="role-icon">
+                        <i class="fas fa-paint-brush"></i>
+                    </div>
+                    <h3>Artisans</h3>
+                    <ul>
+                        <li>Access free raw materials</li>
+                        <li>Accept craft orders</li>
+                        <li>Showcase your crafts</li>
+                        <li>Grow your business</li>
+                    </ul>
+                </div>
+                <div class="role-card">
+                    <div class="role-icon">
+                        <i class="fas fa-user-tie"></i>
+                    </div>
+                    <h3>Administrators</h3>
+                    <ul>
+                        <li>Monitor system usage</li>
+                        <li>Generate impact reports</li>
+                        <li>Connect stakeholders</li>
+                        <li>Expand the network</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Impact Section -->
+    <section class="impact" id="impact">
+        <div class="container">
+            <h2 class="section-title">Our Impact</h2>
+            <div class="impact-stats">
+                <div class="stat-card">
+                    <div class="stat-number counter" data-target="2500">0</div>
+                    <div class="stat-label">Tons of Waste Recycled</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number counter" data-target="1200">0</div>
+                    <div class="stat-label">Artisans Supported</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number counter" data-target="850">0</div>
+                    <div class="stat-label">Farmers Benefited</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number counter" data-target="45000">0</div>
+                    <div class="stat-label">CO₂ Emissions Saved</div>
+                </div>
+            </div>
+
+            <div class="testimonial-slider">
+                <div class="testimonials">
+                    <div class="testimonial active">
+                        <div class="testimonial-content">
+                            <p>"I used to burn my rice straw. Now it becomes beautiful baskets, and I earn extra
+                                income!"</p>
+                            <div class="testimonial-author">- Ramesh Kumar, Rice Farmer</div>
+                        </div>
+                        <div class="testimonial-image">
+                            <img src="/api/placeholder/300/200" alt="Before and after transformation">
+                        </div>
+                    </div>
+                    <div class="testimonial">
+                        <div class="testimonial-content">
+                            <p>"My handicraft business has grown 300% since joining this platform. The steady supply of
+                                materials has changed my life."</p>
+                            <div class="testimonial-author">- Lakshmi Devi, Artisan</div>
+                        </div>
+                        <div class="testimonial-image">
+                            <img src="/api/placeholder/300/200" alt="Before and after transformation">
+                        </div>
+                    </div>
+                    <div class="testimonial">
+                        <div class="testimonial-content">
+                            <p>"Our women's SHG now makes decorative items from sugarcane waste, providing income to 25
+                                families in our village."</p>
+                            <div class="testimonial-author">- Sunita Patel, SHG Leader</div>
+                        </div>
+                        <div class="testimonial-image">
+                            <img src="/api/placeholder/300/200" alt="Before and after transformation">
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial-controls">
+                    <button class="prev-btn"><i class="fas fa-chevron-left"></i></button>
+                    <div class="dots">
+                        <span class="dot active" data-index="0"></span>
+                        <span class="dot" data-index="1"></span>
+                        <span class="dot" data-index="2"></span>
+                    </div>
+                    <button class="next-btn"><i class="fas fa-chevron-right"></i></button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Craft Gallery -->
+    <section class="craft-gallery">
+        <div class="container">
+            <h2 class="section-title">Explore Crafts</h2>
+            <div class="gallery-wrapper">
+                <div class="craft-carousel">
+                    <div class="craft-item">
+                        <div class="craft-image">
+                            <img src="/api/placeholder/300/300" alt="Bamboo Baskets">
+                        </div>
+                        <h4>Bamboo Baskets</h4>
+                        <p>Made from bamboo waste</p>
+                    </div>
+                    <div class="craft-item">
+                        <div class="craft-image">
+                            <img src="/api/placeholder/300/300" alt="Coconut Shell Decor">
+                        </div>
+                        <h4>Coconut Shell Decor</h4>
+                        <p>Upcycled coconut waste</p>
+                    </div>
+                    <div class="craft-item">
+                        <div class="craft-image">
+                            <img src="/api/placeholder/300/300" alt="Rice Straw Mats">
+                        </div>
+                        <h4>Rice Straw Mats</h4>
+                        <p>Eco-friendly floor coverings</p>
+                    </div>
+                    <div class="craft-item">
+                        <div class="craft-image">
+                            <img src="/api/placeholder/300/300" alt="Jute Bags">
+                        </div>
+                        <h4>Jute Bags</h4>
+                        <p>Created from jute waste</p>
+                    </div>
+                </div>
+                <div class="carousel-controls">
+                    <button class="prev-craft"><i class="fas fa-chevron-left"></i></button>
+                    <button class="next-craft"><i class="fas fa-chevron-right"></i></button>
+                </div>
+            </div>
+            <div class="gallery-cta">
+                <a href="#" class="btn btn-secondary">See All Crafts</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-about">
+                    <h3>About AgriWaste to HandiCrafts</h3>
+                    <p>A sustainable initiative connecting farmers with artisans to transform agricultural waste into
+                        beautiful handicrafts, creating value and reducing environmental impact.</p>
+                    <div class="social-icons">
+                        <a href="#"><i class="fab fa-facebook"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-linkedin"></i></a>
+                    </div>
+                </div>
+                <div class="footer-links">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="#">Home</a></li>
+                        <li><a href="#">About Us</a></li>
+                        <li><a href="#">How It Works</a></li>
+                        <li><a href="#">Impact</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Terms of Service</a></li>
+                    </ul>
+                </div>
+                <div class="footer-contact">
+                    <h3>Contact Us</h3>
+                    <p><i class="fas fa-map-marker-alt"></i> 123 Green Road, EcoCity</p>
+                    <p><i class="fas fa-phone"></i> +91 9876543210</p>
+                    <p><i class="fas fa-envelope"></i> info@agriwastetohandicrafts.org</p>
+                </div>
+                <div class="footer-newsletter">
+                    <h3>Subscribe to Newsletter</h3>
+                    <p>Stay updated with the latest news and success stories.</p>
+                    <form class="newsletter-form">
+                        <input type="email" placeholder="Enter your email">
+                        <button type="submit" class="btn-subscribe">Subscribe</button>
+                    </form>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 AgriWaste to HandiCrafts. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js">document.addEventListener('DOMContentLoaded', function () {
+            // Mobile Menu Toggle
+            const mobileMenu = document.getElementById('mobile-menu');
+            const navMenu = document.querySelector('.nav-menu');
+
+            if (mobileMenu) {
+                mobileMenu.addEventListener('click', function () {
+                    mobileMenu.classList.toggle('active');
+                    navMenu.classList.toggle('active');
+
+                    // Toggle hamburger to X
+                    const bars = mobileMenu.querySelectorAll('.bar');
+                    if (mobileMenu.classList.contains('active')) {
+                        bars[0].style.transform = 'rotate(-45deg) translate(-5px, 6px)';
+                        bars[1].style.opacity = '0';
+                        bars[2].style.transform = 'rotate(45deg) translate(-5px, -6px)';
+                    } else {
+                        bars[0].style.transform = 'none';
+                        bars[1].style.opacity = '1';
+                        bars[2].style.transform = 'none';
+                    }
+                });
+            }
+
+            // Navbar scroll effect
+            const navbar = document.querySelector('.navbar');
+            window.addEventListener('scroll', function () {
+                if (window.scrollY > 50) {
+                    navbar.classList.add('scrolled');
+                } else {
+                    navbar.classList.remove('scrolled');
+                }
+            });
+
+            // Smooth scrolling for anchor links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth'
+                        });
+
+                        // Close mobile menu if open
+                        if (navMenu.classList.contains('active')) {
+                            mobileMenu.click();
+                        }
+                    }
+                });
+            });
+
+            // Testimonial Slider
+            const testimonials = document.querySelectorAll('.testimonial');
+            const dots = document.querySelectorAll('.dot');
+            const prevBtn = document.querySelector('.prev-btn');
+            const nextBtn = document.querySelector('.next-btn');
+            let currentIndex = 0;
+
+            function showTestimonial(index) {
+                testimonials.forEach(testimonial => {
+                    testimonial.classList.remove('active');
+                });
+                dots.forEach(dot => {
+                    dot.classList.remove('active');
+                });
+
+                testimonials[index].classList.add('active');
+                dots[index].classList.add('active');
+                currentIndex = index;
+            }
+
+            if (dots.length > 0) {
+                dots.forEach(dot => {
+                    dot.addEventListener('click', function () {
+                        const index = parseInt(this.getAttribute('data-index'));
+                        showTestimonial(index);
+                    });
+                });
+            }
+
+            if (prevBtn) {
+                prevBtn.addEventListener('click', function () {
+                    currentIndex = (currentIndex === 0) ? testimonials.length - 1 : currentIndex - 1;
+                    showTestimonial(currentIndex);
+                });
+            }
+
+            if (nextBtn) {
+                nextBtn.addEventListener('click', function () {
+                    currentIndex = (currentIndex === testimonials.length - 1) ? 0 : currentIndex + 1;
+                    showTestimonial(currentIndex);
+                });
+            }
+
+            // Auto slide testimonials
+            setInterval(function () {
+                if (testimonials.length > 0) {
+                    currentIndex = (currentIndex === testimonials.length - 1) ? 0 : currentIndex + 1;
+                    showTestimonial(currentIndex);
+                }
+            }, 5000);
+
+            // Craft Gallery Carousel
+            const craftCarousel = document.querySelector('.craft-carousel');
+            const craftItems = document.querySelectorAll('.craft-item');
+            const prevCraft = document.querySelector('.prev-craft');
+            const nextCraft = document.querySelector('.next-craft');
+            let craftPosition = 0;
+            const craftItemWidth = craftItems.length > 0 ? craftItems[0].offsetWidth + 30 : 0; // Width + gap
+
+            function updateCraftPosition() {
+                if (craftCarousel) {
+                    craftCarousel.style.transform = `translateX(${craftPosition}px)`;
+                }
+            }
+
+            if (prevCraft) {
+                prevCraft.addEventListener('click', function () {
+                    if (craftPosition < 0) {
+                        craftPosition += craftItemWidth;
+                        updateCraftPosition();
+                    }
+                });
+            }
+
+            if (nextCraft) {
+                nextCraft.addEventListener('click', function () {
+                    const maxScroll = -(craftItemWidth * (craftItems.length - Math.floor(craftCarousel.offsetWidth / craftItemWidth)));
+                    if (craftPosition > maxScroll) {
+                        craftPosition -= craftItemWidth;
+                        updateCraftPosition();
+                    }
+                });
+            }
+
+            // Counter Animation
+            const counters = document.querySelectorAll('.counter');
+
+            function animateCounter(counter) {
+                const target = +counter.getAttribute('data-target');
+                const count = +counter.innerText;
+                const increment = target / 100;
+
+                if (count < target) {
+                    counter.innerText = Math.ceil(count + increment);
+                    setTimeout(() => animateCounter(counter), 30);
+                } else {
+                    counter.innerText = target.toLocaleString();
+                }
+            }
+
+            // Intersection Observer for fade-in elements
+            const fadeElements = document.querySelectorAll('.fade-in');
+            const statElements = document.querySelectorAll('.stat-card');
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('active');
+
+                        // If it's a counter, start animation
+                        const counter = entry.target.querySelector('.counter');
+                        if (counter) {
+                            animateCounter(counter);
+                        }
+
+                        // Apply delay if specified
+                        if (entry.target.hasAttribute('data-delay')) {
+                            const delay = parseInt(entry.target.getAttribute('data-delay'));
+                            entry.target.style.transitionDelay = `${delay}ms`;
+                        }
+
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, {
+                threshold: 0.2
+            });
+
+            fadeElements.forEach(element => {
+                observer.observe(element);
+            });
+
+            statElements.forEach(element => {
+                observer.observe(element);
+            });
+
+            // Newsletter form validation
+            const newsletterForm = document.querySelector('.newsletter-form');
+            if (newsletterForm) {
+                newsletterForm.addEventListener('submit', function (e) {
+                    e.preventDefault();
+                    const emailInput = this.querySelector('input[type="email"]');
+                    const email = emailInput.value.trim();
+
+                    if (email && /^\S+@\S+\.\S+$/.test(email)) {
+                        // Success - would typically send to server
+                        emailInput.value = '';
+                        alert('Thank you for subscribing to our newsletter!');
+                    } else {
+                        alert('Please enter a valid email address.');
+                    }
+                });
+            }
+        });</script>
+</body>
+
+</html>

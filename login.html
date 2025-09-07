@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - PrakritiKriti</title>
+    <style>
+        :root {
+            --primary-color: #4caf50;
+            --primary-light: #80e27e;
+            --primary-dark: #087f23;
+            --white: #ffffff;
+            --error: #ff3333;
+            --text-color: #333333;
+            --text-dark: #222222;
+        }
+
+        body {
+            background: url('home.jpg') no-repeat center center fixed;
+            background-size: cover;
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.8);
+            z-index: -1;
+        }
+
+        .container {
+            width: 80%;
+            max-width: 900px;
+            display: flex;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            height: 500px;
+        }
+
+        .image-section {
+            flex: 1;
+            background: var(--primary-color);
+            padding: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            color: var(--white);
+        }
+
+        .image-content {
+            text-align: center;
+            z-index: 1;
+        }
+
+        .image-content h2 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            color: var(--white);
+        }
+
+        .image-content p {
+            font-size: 1rem;
+            line-height: 1.6;
+            color: var(--white);
+            opacity: 0.9;
+        }
+
+        .form-container {
+            flex: 1;
+            padding: 40px;
+            background: var(--white);
+        }
+
+        h1 {
+            font-size: 2rem;
+            color: var(--primary-dark);
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-color);
+            font-size: 0.9rem;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px var(--primary-light);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .signup-link {
+            text-align: center;
+            margin-top: 25px;
+            font-size: 0.9rem;
+        }
+
+        .signup-link a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .forgot-password {
+            text-align: right;
+            margin-top: -15px;
+            margin-bottom: 20px;
+        }
+
+        .forgot-password a {
+            color: var(--text-color);
+            text-decoration: none;
+            font-size: 0.85rem;
+        }
+
+        .error {
+            color: #ff3333;
+            font-size: 0.875rem;
+            margin-top: 5px;
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                width: 95%;
+                flex-direction: column;
+                height: auto;
+            }
+
+            .image-section {
+                padding: 30px;
+            }
+
+            .image-content h2 {
+                font-size: 1.5rem;
+            }
+
+            .form-container {
+                padding: 30px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="image-section">
+            <div class="image-content">
+                <h2>Welcome Back!</h2>
+                <p>Log in to continue your journey in sustainable crafting and agricultural waste transformation.</p>
+            </div>
+        </div>
+        <div class="form-container">
+            <h1>Login</h1>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" required>
+                    <span class="error" id="emailError"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" required>
+                    <span class="error" id="passwordError"></span>
+                </div>
+
+                <div class="forgot-password">
+                    <a href="resetpassword.html" id="forgotPassword">Forgot Password?</a>
+                </div>
+
+                <button type="submit" class="btn">Login</button>
+            </form>
+
+            <div class="signup-link">
+                Don't have an account? <a href="signup.html">Sign Up</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add this where you want to display user info in your dashboard -->
+    <div class="user-info">
+        <span id="userName"></span>
+        <span id="userEmail"></span>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Initialize Firebase
+            const firebaseConfig = {
+                apiKey: "AIzaSyCgvhMdnHX9yVvMBJdh3uaBYbUIdPtD9_k",
+                authDomain: "prakritikriti-d5603.firebaseapp.com",
+                databaseURL: "https://prakritikriti-d5603-default-rtdb.firebaseio.com",
+                projectId: "prakritikriti-d5603",
+                storageBucket: "prakritikriti-d5603.firebasestorage.app",
+                messagingSenderId: "1050876813362",
+                appId: "1:1050876813362:web:38ffd26d667ff4a8dddc2b"
+            };
+
+            firebase.initializeApp(firebaseConfig);
+            const auth = firebase.auth();
+            const database = firebase.database();
+
+            const loginForm = document.getElementById('loginForm');
+            loginForm.addEventListener('submit', async function (e) {
+                e.preventDefault();
+
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+
+                try {
+                    // Authenticate with Firebase
+                    const userCredential = await auth.signInWithEmailAndPassword(email, password);
+
+                    // Get user data from database
+                    const usersRef = database.ref('users');
+                    const snapshot = await usersRef.once('value');
+                    const users = snapshot.val();
+
+                    // Find user by email
+                    let userData = null;
+                    Object.entries(users).forEach(([key, user]) => {
+                        if (user.email === email) {
+                            userData = user;
+                            userData.userKey = key;
+                        }
+                    });
+
+                    if (userData) {
+                        // Store user info in session storage
+                        const userInfo = {
+                            userId: userData.userKey,
+                            email: userData.email,
+                            ID: userData.ID,
+                            role: userData.role,
+                            username: userData.username
+                        };
+                        sessionStorage.setItem('userInfo', JSON.stringify(userInfo));
+
+                        // Redirect based on role with respective IDs
+                        if (userData.role === 'farmer') {
+                            window.location.href = `demodash.html?farmerID=${userData.ID}`;
+                        } else if (userData.role === 'artisan') {
+                            window.location.href = `artisandashboard.html?artisanID=${userData.ID}`;
+                        }
+                    } else {
+                        throw new Error('User data not found');
+                    }
+                } catch (error) {
+                    console.error('Login error:', error);
+                    handleLoginError(error);
+                }
+            });
+
+            function handleLoginError(error) {
+                switch (error.code) {
+                    case 'auth/invalid-login-credentials':
+                    case 'auth/user-not-found':
+                    case 'auth/wrong-password':
+                        showError('emailError', 'Invalid email or password');
+                        break;
+                    case 'auth/invalid-email':
+                        showError('emailError', 'Invalid email format');
+                        break;
+                    case 'auth/too-many-requests':
+                        showError('emailError', 'Too many failed attempts. Please try again later');
+                        break;
+                    default:
+                        showError('emailError', 'An error occurred. Please try again');
+                        console.error(error);
+                }
+            }
+
+            function showError(elementId, message) {
+                const errorElement = document.getElementById(elementId);
+                if (errorElement) {
+                    errorElement.textContent = message;
+                    errorElement.style.display = 'block';
+                }
+            }
+
+            function clearErrors() {
+                const errorElements = document.querySelectorAll('.error');
+                errorElements.forEach(element => {
+                    element.textContent = '';
+                    element.style.display = 'none';
+                });
+            }
+        });
+    </script>
+</body>
+
+</html>
